@@ -1,92 +1,56 @@
 #pragma once
 
 
-#include <iostream> 
-#include <GL/freeglut.h>       
-
-using namespace std;
-
-class Vec3D {
-public:
-	Vec3D(){
-		x = 0;
-		y = 0;
-		z = 0;
-	}
-
-	Vec3D(float x, float y, float z){
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-
-	Vec3D & operator+=(const Vec3D & vec2){
-		this->x += vec2.x;
-		this->y += vec2.y;
-		this->z += vec2.z;
-		return *this;
-	}
-
-	Vec3D & operator-=(const Vec3D & vec2){
-		this->x -= vec2.x;
-		this->y -= vec2.y;
-		this->z -= vec2.z;
-		return *this;
-	}
-
-	float x;
-	float y;
-	float z;
-};
+#include <iostream>
+#include <map>
+#include <GL/freeglut.h>
+#include "util.h"
+#include "Animation.h"
 
 
 class Entity {
 public:
 	Entity(){
-		m_Translation = Vec3D();
-		m_Rotation = Vec3D();
-		m_Scale = Vec3D(1,1,1);
-		m_Angle = 0;
+		m_Transformation = Transformation(Vec3D(),Vec3D(1,1,1));
 		m_Active = true;
 		m_Parent = NULL;
 	}
 
 	Entity(float x, float y){
 		m_Active = true;
-		m_Translation = Vec3D(x,y,0);
+		m_Transformation = Transformation(Vec3D(x,y,0),Vec3D(1,1,1));
 	}
 
 	Entity(float x, float y, float size){
 		Entity();
 		m_Active = true;
-		m_Translation = Vec3D(x,y,0);
-		m_Scale = Vec3D(size,size,size);
+		m_Transformation = Transformation(Vec3D(x,y,0),Vec3D(size,size,size));
 	}
 
 	Entity(float x, float y, Vec3D scale){
 		Entity();
 		m_Active = true;
-		m_Translation = Vec3D(x,y,0);
-		m_Scale = scale;
+		m_Transformation = Transformation(Vec3D(x,y,0),scale);
 	}
 
 	~Entity(){
 
 	}
-	//TODO: Test Achtung: Ght nach oben und addiert parent vec drauf
+
 	Vec3D getAbsoluteTranslation(Entity *entity, Vec3D translation){
 		Entity* parent = entity->getParent();
 
 		if(parent == NULL){
-			translation += entity->m_Translation;
+			translation += entity->getTransformation()->m_Translation;
 			return translation;
 		}else{
-			translation += parent->m_Translation;
+			translation += parent->getTransformation()->m_Translation;
 			return getAbsoluteTranslation(parent,translation);
 		}
 	}
 
 	//TODO: Think of maybe centered coordinates :/
+	//TODO: Think of Rotation later
 	Entity* collides(Entity entity){
 
 		for(auto& part: m_Parts){
@@ -96,14 +60,14 @@ public:
 		}
 
 		Vec3D translation = getAbsoluteTranslation(this,Vec3D());
-		Vec3D scale = m_Scale;
+		Vec3D scale = m_Transformation.m_Scale;
 
 		//Check for non-collision on every site
-		if((translation.x > entity.getPos()->x + entity.getScale()->x)		//Left Side
-		   	|| (translation.x + scale.x < entity.getPos()->x )				//Right Side
-		 	|| (translation.y > entity.getPos()->y + entity.getScale()->y)	//Up Side
-			||(translation.y + scale.y < entity.getPos()->y)	)			//Down Side
-			return NULL;
+		if((translation.x > entity.m_Transformation.m_Translation.x + entity.m_Transformation.m_Scale.x)	//Left Side
+		   	|| (translation.x + scale.x < entity.m_Transformation.m_Translation.x )							//Right Side
+		 	|| (translation.y > entity.m_Transformation.m_Translation.y + m_Transformation.m_Scale.y)		//Up Side
+			||(translation.y + scale.y < entity.m_Transformation.m_Translation.y)	)						//Down Side
+			return NULL;																					//TODO: Front and back
 
 		return this;
 	}
@@ -113,28 +77,50 @@ public:
 		m_Parts.push_back(part);
 	}
 
+	//TODO: Maybe delete old
+	void addPart(string name, Entity *part){
+		part->setParent(this);
+		m_NamedParts[name] = part;
+	}
+
+	Entity* getPart(string name){
+		return m_NamedParts[name];
+	}
+
 	vector<Entity*> *getParts(){
 		return &m_Parts;
 	}
 
 	// Draw with parent pos + offset of part
-	void draw(Vec3D translation = Vec3D(), Vec3D rotation = Vec3D(), float angle = 0){
+	void draw(Transformation transformation = Transformation()){
 		glPushMatrix();
 
-		translation += m_Translation;
-		rotation += m_Rotation;
-		angle += m_Angle;
+		for(auto& anim : m_PlayingAnimations){
+			Transformation *animTransformation = anim.second->tick();
+			if(animTransformation == NULL){
+				map<string,Animation*>::iterator it = m_PlayingAnimations.find(anim.first);
+				m_PlayingAnimations.erase(it);
+				continue;
+			}
+			m_Transformation += *animTransformation;
+			//cout << "Adding to scalex " << animTransformation->m_Scale.x << endl;
+			//m_Transformation.m_Scale += animTransformation->m_Scale;
+		}
 
-		glTranslatef(translation.x, translation.y , translation.z );
-		glRotatef(angle, rotation.x , rotation.y , rotation.z);
-		glScalef(m_Scale.x,m_Scale.y,m_Scale.z);
+
+		transformation += m_Transformation;
+		transformation.m_Scale = m_Transformation.m_Scale;
+
+		glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
+		glRotatef(transformation.m_Angle, transformation.m_Rotation.x , transformation.m_Rotation.y , transformation.m_Rotation.z);
+		glScalef(transformation.m_Scale.x,transformation.m_Scale.y,transformation.m_Scale.z);
 
 		glColor3f(1,1,1);
 		drawBody();
 		glPopMatrix();
 
 		for(auto& part : m_Parts){
-			part->draw(translation, rotation, angle);
+			part->draw(transformation);
 		}
 	}
 
@@ -142,7 +128,7 @@ public:
 
 		float fSeitenL = 1;
 
-		glBegin(GL_POLYGON);   //Vorderseite
+		/*glBegin(GL_POLYGON);   //Vorderseite
 		//glColor4f(1.0f,0.0f,0.0f,1.0f);	//ROT
 		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
 		//glColor4f(1.0f,1.0f,0.0f,1.0f); //GELB
@@ -209,48 +195,81 @@ public:
 		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
 		//glColor4f(1.0f,0.0f,0.0f,1.0f); //ROT
 		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
+		glEnd();*/
+
+		glBegin(GL_POLYGON);   //Vorderseite
+		glColor4f(1.0f,0.0f,0.0f,1.0f);	//ROT
+		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
+		glColor4f(1.0f,1.0f,0.0f,1.0f); //GELB
+		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
+		glColor4f(1.0f,1.0f,1.0f,1.0f); //WEISS
+		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
+		glColor4f(1.0f,0.0f,1.0f,1.0f); //MAGENTA
+		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
 		glEnd();
-	}
 
-	void setTranslation(float x, float y, float z){
-		m_Translation = Vec3D(x,y,z);
-	}
 
-	Vec3D* getTranslation(){
-		return &m_Translation;
-	}
+		glBegin(GL_POLYGON);   //Rechte Seite
+		glColor4f(1.0f,1.0f,0.0f,1.0f); //GELB
+		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
+		glColor4f(0.0f,1.0f,0.0f,1.0f); //GRUEN
+		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
+		glColor4f(0.0f,1.0f,1.0f,1.0f);	//CYAN
+		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
+		glColor4f(1.0f,1.0f,1.0f,1.0f); //WEISS
+		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
+		glEnd();
 
-	void setRotation(float angle, float x, float y, float z){
-		m_Angle = angle;
-		m_Rotation = Vec3D(x,y,z);
-	}
 
-	Vec3D* getRotation(){
-		return &m_Rotation;
-	}
+		glBegin(GL_POLYGON);   //Rueckseite
+		glColor4f(0.0f,1.0f,1.0f,1.0f); //CYAN
+		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
+		glColor4f(0.0f,1.0f,0.0f,1.0f); //GRUEN
+		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
+		glColor4f(0.0f,0.0f,0.0f,1.0f); //SCHWARZ
+		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
+		glColor4f(0.0f,0.0f,1.0f,1.0f); //BLAU
+		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
+		glEnd();
 
-	float getAngle(){
-		return m_Angle;
-	}
 
-	void setScale(float x, float y, float z){
-		m_Scale = Vec3D(x,y,z);
-	}
+		glBegin(GL_POLYGON);   //Linke Seite
+		glColor4f(0.0f,0.0f,1.0f,1.0f); //BLAU
+		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
+		glColor4f(0.0f,0.0f,0.0f,1.0f); //SCHWARZ
+		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
+		glColor4f(1.0f,0.0f,0.0f,1.0f); //ROT
+		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
+		glColor4f(1.0f,0.0f,1.0f,1.0f); //MAGENTA
+		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
+		glEnd();
 
-	Vec3D* getScale(){
-		return &m_Scale;
-	}
+		glBegin(GL_POLYGON);   //Deckflaeche
+		glColor4f(1.0f,0.0f,1.0f,1.0f); //MAGENTA
+		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
+		glColor4f(1.0f,1.0f,1.0f,1.0f); //WEISS
+		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
+		glColor4f(0.0f,1.0f,1.0f,1.0f); //CYAN
+		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
+		glColor4f(0.0f,0.0f,1.0f,1.0f); //BLAU
+		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
+		glEnd();
 
-	void setPos(Vec3D v){
-		m_Translation = v;
+		glBegin(GL_POLYGON);   //Bodenflaeche
+		glColor4f(0.0f,0.0f,0.0f,1.0f); //SCHWARZ
+		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
+		glColor4f(0.0f,1.0f,0.0f,1.0f); //GRUEN
+		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
+		glColor4f(1.0f,1.0f,0.0f,1.0f); //GELB
+		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
+		glColor4f(1.0f,0.0f,0.0f,1.0f); //ROT
+		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
+		glEnd();
+
 	}
 
 	void setActive(bool a){
 		m_Active = a;
-	}
-
-	Vec3D * getPos(){
-		return &m_Translation;
 	}
 
 	bool isActive(){
@@ -265,16 +284,41 @@ public:
 		return m_Parent;
 	}
 
+	void setTransformation(Transformation transformation){
+		m_Transformation = transformation;
+	}
+
+	Transformation* getTransformation(){
+		return &m_Transformation;
+	}
+
+	void addAnimation(string name, Animation *animation){
+		m_Animations[name] = animation;
+	}
+
+	Animation *getAnimation(string name){
+		return m_Animations[name];
+	}
+
+	void playAnimation(string name, int loops){
+		m_PlayingAnimations[name] = m_Animations[name];
+		m_PlayingAnimations[name]->reload();
+		m_PlayingAnimations[name]->setMaxLoops(loops);
+	}
+
+	void stopAnimation(string name){
+		map<string,Animation*>::iterator it = m_PlayingAnimations.find(name);
+		m_PlayingAnimations.erase(it);
+	}
+
 protected:
-	Vec3D m_Translation;
-	float m_Angle;
-	Vec3D m_Rotation;
-	Vec3D m_Scale;
-
-	vector<Entity*> m_Parts;
-	bool m_Active;
-
-	Vec3D absPos = Vec3D();
+	Transformation m_Transformation;
 
 	Entity* m_Parent;
+	vector<Entity*> m_Parts;
+	map<string,Entity*> m_NamedParts;
+	map<string,Animation*> m_Animations;
+	map<string,Animation*> m_PlayingAnimations;
+	bool m_Active;
+
 };

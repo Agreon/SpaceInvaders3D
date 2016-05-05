@@ -21,9 +21,7 @@ bool Game::init(int sWidth, int sHeight){
 	}
 
 	m_Player = new Entity(0,-100, Vec3D(15,18,10));
-	Entity* body = new Entity(0,0,40);
-	body->setScale(40,20,10);
-	body->setTranslation(0,-20,0);
+	Entity* body = new Entity(0,-20,Vec3D(40,20,10));
 	m_Player->addPart(body);
 
 	for(int i = 0; i < (m_ScreenWidth-150) / 100; i++){
@@ -31,6 +29,14 @@ bool Game::init(int sWidth, int sHeight){
 			m_Enemies.push_back(new Entity(i*50 - (m_ScreenWidth/2) + 200 ,(j*50)-(m_ScreenHeight/2) + 300,10));
 		}
 	}
+
+	Animation *playerAnim = new Animation();
+	playerAnim->addAnimationPart(AnimationPart(Transformation(Vec3D(50,0,0),Vec3D(0,0,0)),50));
+	playerAnim->addAnimationPart(AnimationPart(Transformation(Vec3D(-50,0,0),Vec3D(0,0,0)),50));
+		//playerAnim->addAnimationPart(AnimationPart(Transformation(Vec3D(0,0,0),Vec3D(10,10,10)),50));
+	m_Player->addAnimation("moving",playerAnim);
+	m_Player->getTransformation()->m_Rotation = Vec3D(0,1,0);
+	//m_Player->playAnimation("moving",2);
 
 	return true;
 }
@@ -43,18 +49,28 @@ void Game::keyUp(char key){
 	m_Keys[key] = false;
 
 	if(key == 'e'){
-		m_Lasers.push_back(new Laser(m_Player->getPos()->x,m_Player->getPos()->y,1));
+		m_Lasers.push_back(new Laser(m_Player->getTransformation()->m_Translation.x,m_Player->getTransformation()->m_Translation.y,1));
 	}
-
 }
 
 //TODO: Vlt. smoothe bewegungen einbauen
 void Game::event(){
 	if(m_Keys['a']){
-		m_Player->getPos()->x -= 2;
+		m_Player->getTransformation()->m_Translation.x -= 2;
+		if(m_Player->getTransformation()->m_Angle > -45)
+			m_Player->getTransformation()->m_Angle -= 2;
+
 	}
-	if(m_Keys['d']){
-		m_Player->getPos()->x += 2;
+	else if(m_Keys['d']){
+		m_Player->getTransformation()->m_Translation.x += 2;
+		if(m_Player->getTransformation()->m_Angle < 45)
+			m_Player->getTransformation()->m_Angle += 2;
+	}else{
+		if(m_Player->getTransformation()->m_Angle > 0){
+			m_Player->getTransformation()->m_Angle -= 3;
+		}else if(m_Player->getTransformation()->m_Angle < 0){
+			m_Player->getTransformation()->m_Angle += 3;
+		}
 	}
 }
 
@@ -68,14 +84,14 @@ void Game::update(){
 
 	for(auto& laser : m_Lasers){
 		laser->update();
-		if(laser->getPos()->y > m_ScreenHeight/2){
+		if(laser->getTransformation()->m_Translation.y > m_ScreenHeight/2){
 			laser->setActive(false);
 		}
 	}
 
 	for(auto& laser : m_EnemyLasers){
 		laser->update();
-		if(laser->getPos()->y < -(m_ScreenHeight/2)){
+		if(laser->getTransformation()->m_Translation.y < -(m_ScreenHeight/2)){
 			laser->setActive(false);
 		}
 		Entity *collidingWith = m_Player->collides(*laser);
@@ -118,6 +134,8 @@ void Game::draw(){
 	glLoadIdentity();   // Aktuelle Model-/View-Transformations-Matrix zuruecksetzen
 
 	gluLookAt(0,0,m_ScreenWidth/2,0,0,0,0,1,0);
+
+	//glRotatef(-45,1,0,0);
 
 	m_Player->draw();
 
