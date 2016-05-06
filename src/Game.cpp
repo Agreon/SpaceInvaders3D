@@ -30,6 +30,20 @@ bool Game::init(int sWidth, int sHeight){
 		}
 	}
 
+	//Create Barriers
+	for(int i = 0; i < 3; i++){
+		m_Barricades.push_back(new Entity(i*200,-30,0));
+
+		Entity* row1 = new Entity(0,-10,Vec3D(10,10,10));
+		Entity* row2 = new Entity(0,-20,Vec3D(20,10,10));
+		Entity* row3 = new Entity(0,-30,Vec3D(30,10,10));
+		m_Barricades[i]->addPart(row1);
+		m_Barricades[i]->addPart(row2);
+		m_Barricades[i]->addPart(row3);
+
+		m_Barricades[i]->setCollisionEnabled(false);
+	}
+
 	Animation *playerAnim = new Animation();
 	playerAnim->addAnimationPart(AnimationPart(Transformation(Vec3D(50,0,0),Vec3D(0,0,0)),50));
 	playerAnim->addAnimationPart(AnimationPart(Transformation(Vec3D(-50,0,0),Vec3D(0,0,0)),50));
@@ -102,6 +116,7 @@ void Game::update(){
 		}
 	}
 
+	// TODO: Collision not working
 	for(auto& enemy : m_Enemies){
 		for(auto& laser : m_Lasers){
 
@@ -115,15 +130,46 @@ void Game::update(){
 		}
 	}
 
+	for(auto& laser : m_EnemyLasers){
+		for(auto& barricade : m_Barricades){
+
+			Entity *collidingWith = barricade->collides(*laser);
+
+			if(collidingWith != NULL){
+				collidingWith->setActive(false);
+				laser->setActive(false);
+				break;
+			}
+
+		}
+	}
+
+	//TODO: Maybe delete objekt with children
 	for(int i = 0; i < m_Lasers.size(); i++){
+
+		m_Lasers[i]->deleteInactiveChildren();
+
 		if(m_Lasers[i]->isActive() == false){
 			m_Lasers.erase(m_Lasers.begin() + i);
 		}
 	}
 
 	for(int i = 0; i < m_Enemies.size(); i++){
+
+		m_Enemies[i]->deleteInactiveChildren();
+
 		if(m_Enemies[i]->isActive() == false){
 			m_Enemies.erase(m_Enemies.begin() + i);
+		}
+	}
+
+	for(int i = 0; i < m_Barricades.size(); i++){
+
+		m_Barricades[i]->deleteInactiveChildren();
+
+		if(m_Barricades[i]->isActive() == false || m_Barricades[i]->getParts()->size() < 1){
+			cout << "Finally deleting barricade" << endl;
+			m_Barricades.erase(m_Barricades.begin() + i);
 		}
 	}
 
@@ -141,6 +187,10 @@ void Game::draw(){
 
 	for(auto& enemy: m_Enemies){
 		enemy->draw();
+	}
+
+	for(auto& barricade: m_Barricades){
+		barricade->draw();
 	}
 
 	for (auto& laser : m_Lasers){

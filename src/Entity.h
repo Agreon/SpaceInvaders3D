@@ -14,23 +14,27 @@ public:
 		m_Transformation = Transformation(Vec3D(),Vec3D(1,1,1));
 		m_Active = true;
 		m_Parent = NULL;
+		m_CollisionEnabled = true;
 	}
 
 	Entity(float x, float y){
 		m_Active = true;
 		m_Transformation = Transformation(Vec3D(x,y,0),Vec3D(1,1,1));
+		m_CollisionEnabled = true;
 	}
 
 	Entity(float x, float y, float size){
 		Entity();
 		m_Active = true;
 		m_Transformation = Transformation(Vec3D(x,y,0),Vec3D(size,size,size));
+		m_CollisionEnabled = true;
 	}
 
 	Entity(float x, float y, Vec3D scale){
 		Entity();
 		m_Active = true;
 		m_Transformation = Transformation(Vec3D(x,y,0),scale);
+		m_CollisionEnabled = true;
 	}
 
 	~Entity(){
@@ -58,6 +62,9 @@ public:
 				return part;
 			}
 		}
+
+		if(m_CollisionEnabled == false)
+			return NULL;
 
 		Vec3D translation = getAbsoluteTranslation(this,Vec3D());
 		Vec3D scale = m_Transformation.m_Scale;
@@ -311,6 +318,22 @@ public:
 		m_PlayingAnimations.erase(it);
 	}
 
+	void setCollisionEnabled(bool b){
+		m_CollisionEnabled = b;
+	}
+
+	//TODO: Vlt. löschen
+	void deleteInactiveChildren(){
+		for(int i = 0; i < m_Parts.size(); i++){
+
+			m_Parts[i]->deleteInactiveChildren();
+
+			if(m_Parts[i]->isActive() == false){
+				m_Parts.erase(m_Parts.begin() + i);
+			}
+		}
+	}
+
 protected:
 	Transformation m_Transformation;
 
@@ -320,5 +343,5 @@ protected:
 	map<string,Animation*> m_Animations;
 	map<string,Animation*> m_PlayingAnimations;
 	bool m_Active;
-
+	bool m_CollisionEnabled;
 };

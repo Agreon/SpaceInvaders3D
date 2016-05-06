@@ -24,6 +24,7 @@ private:
 	vector<Laser*> m_Lasers;
 	vector<Laser*> m_EnemyLasers;
 	vector<Entity*> m_Enemies;
+	vector<Entity*> m_Barricades;
 	//vector<Entity*> entities;
 };
 
