@@ -1,5 +1,5 @@
 #include "Game.h"
-
+#include "Assets.h"
 
 Game::Game()
 {
@@ -20,7 +20,7 @@ bool Game::init(int sWidth, int sHeight){
 		m_Keys[i] = false;
 	}
 
-	m_Player = new Entity(0,-100, Vec3D(15,18,10));
+	m_Player = new Player(0,-100, Vec3D(15,18,10));
 	Entity* body = new Entity(0,-20,Vec3D(40,20,10));
 	m_Player->addPart(body);
 
@@ -52,6 +52,10 @@ bool Game::init(int sWidth, int sHeight){
 	m_Player->getTransformation()->m_Rotation = Vec3D(0,1,0);
 	//m_Player->playAnimation("moving",2);
 
+	Assets::initialize();
+
+	Assets::loadSound("shoot","./assets/shoot.wav");
+
 	return true;
 }
 
@@ -64,12 +68,13 @@ void Game::keyUp(char key){
 
 	if(key == 'e'){
 		m_Lasers.push_back(new Laser(m_Player->getTransformation()->m_Translation.x,m_Player->getTransformation()->m_Translation.y,1));
+		Assets::playSound("shoot");
 	}
 }
 
 //TODO: Vlt. smoothe bewegungen einbauen
 void Game::event(){
-	if(m_Keys['a']){
+/*	if(m_Keys['a']){
 		m_Player->getTransformation()->m_Translation.x -= 2;
 		if(m_Player->getTransformation()->m_Angle > -45)
 			m_Player->getTransformation()->m_Angle -= 2;
@@ -85,7 +90,8 @@ void Game::event(){
 		}else if(m_Player->getTransformation()->m_Angle < 0){
 			m_Player->getTransformation()->m_Angle += 3;
 		}
-	}
+	}*/
+	m_Player->update(m_Keys);
 }
 
 /*

@@ -1,17 +1,29 @@
 #TODO
 
-## Allgemeine, statische Asset-Klasse
-    + Lädt Sound und Texturen
-        + Wie baue ich die Sound klasse auf?
-        
-    + Played der zeigt auf befehl assets mit name-calling
-    
 ## Lichtklasse
     + Erbt von Entity
+    + Extra-Direction
     + http://www.glprogramming.com/red/chapter05.html
+
+## Enemy
+    + dynamische Bewegung einbauen
+
+
+## Allgemeine, statische Asset-Klasse
+    + Lädt Sound und Texturen
+        + http://www.gamedev.net/page/resources/_/technical/game-programming/a-guide-to-starting-with-openal-r2008
+        + Device closing läuft nicht so
+    + Texturen 
+        + Texture Loading
+ 
 
 ## Player
     + Smoothe steuerung
+        + Gebrauchte Komponenten
+            + Velocity
+            + MaxSpeed
+            + incPerFrame
+        -> Done
     + Neigung bei links/rechts
         -> Done
         

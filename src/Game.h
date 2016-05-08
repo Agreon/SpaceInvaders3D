@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "Laser.h"
+#include "Player.h"
 
 class Game
 {
@@ -20,7 +21,7 @@ private:
 
 	bool m_Keys[256];
 
-	Entity *m_Player;
+	Player *m_Player;
 	vector<Laser*> m_Lasers;
 	vector<Laser*> m_EnemyLasers;
 	vector<Entity*> m_Enemies;

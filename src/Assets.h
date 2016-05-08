@@ -13,22 +13,134 @@
 
 using namespace std;
 
-static class Assets{
-public:
+namespace Assets{
 
-        bool initialize(){
-            // Init openAL
-            alutInit(0, NULL);
-            // Clear Error Code (so we can catch any new errors)
-            alGetError();
+    map<string,GLuint> m_Textures;
+    map<string,ALuint> m_Sounds;
+
+    bool initialize(){
+
+        //alutInit(0, NULL);
+        alutInitWithoutContext(NULL,NULL);    //TODO: Ausprobieren falls es nicht klappt
+        alGetError();
+
+        ALCcontext *context;
+        ALCdevice *device;
+
+        device = alcOpenDevice(NULL);
+        if (device == NULL)
+        {
+            cout << "Could not create device" << endl;
+            return false;
         }
 
-        void shutdown(){
+        context = alcCreateContext(device,NULL);
+        alcMakeContextCurrent(context);
+
+    }
+
+    /*
+     * TODO: 1 size is maybe not variable
+     */
+    void shutdown(){
+        for(auto& sound : m_Sounds){
+            alDeleteSources(1, &sound.second);
+        }
+
+        ALCcontext *context = alcGetCurrentContext();
+
+        ALCdevice *device = alcGetContextsDevice(context);
+
+        alcMakeContextCurrent(NULL);
+
+        alcDestroyContext(context);
+
+        alcCloseDevice(device);
+
+        alutExit();
+    }
+
+    bool loadSound(string name, string path){
+
+        ALuint buffer, source;
+
+        //https://wiki.delphigl.com/index.php/alutCreateBufferFromFile
+        buffer = alutCreateBufferFromFile(path.c_str());
+        if(buffer == AL_NONE)
+        {
+            cout << "ERROR while loading file: " << name << endl;
+            cout << alutGetErrorString(alutGetError()) << endl;
+            return false;
+        }
+
+        alGenSources(1, &source);
+        alSourcei(source, AL_BUFFER, buffer);
+
+        cout << "Loaded Sound " << name << endl;
+
+        m_Sounds[name] = source;
+    }
+
+    void playSound(string name){
+        cout << "Playing sound " << name << endl;
+        alSourcePlay(m_Sounds[name]);
+    }
+
+    void stopSound(string name){
+        cout << "Playing sound " << name << endl;
+        alSourceStop(m_Sounds[name]);
+    }
+
+}
+/*
+class Assets{
+public:
+
+        static bool initialize(){
+            int error;
+
+            // Init openAL
+            alutInit(0, NULL);
+            //alutInitWithoutContext(NULL,NULL);
+            // Clear Error Code (so we can catch any new errors)
+            alGetError();
+
+            // Create the buffers
+            alGenBuffers(NUM_BUFFERS, m_Buffers);
+            if ((error = alGetError()) != AL_NO_ERROR)
+            {
+                printf("alGenBuffers : %d", error);
+                return false;
+            }
+
+        }
+
+
+        static bool loadSound(string name, string path){
+            int error;
+
+            ALuint sndBuffer, state, source;
+    // make sure to call alutInitWithoutContext first
+            sndBuffer = alutCreateBufferFromFile(path.c_str());
+            if ( alutGetError() != ALUT_ERROR_NO_ERROR )
+            {
+                printf("alutLoadWAVFile exciting_sound.wav : %d", error);
+                // handle the error
+                return false;
+            }
+
+            alGenSources(1, &source);
+            alSourcei(source, AL_BUFFER, sndBuffer);
+
+            m_Sounds[name] = source;
+        }
+
+        static void shutdown(){
             alutExit();
         }
 
         //External LoadBMP function
-        bool loadTexture(string name, string path){
+        static bool loadTexture(string name, string path){
             // Data read from the header of the BMP file
             unsigned char header[54]; // Each BMP file begins by a 54-bytes header
             unsigned int dataPos;     // Position in the file where the actual data begins
@@ -38,7 +150,7 @@ public:
             unsigned char * data;
 
             // Open the file
-            FILE * file = fopen(path,"rb");
+            FILE * file = fopen(path.c_str(),"rb");
             if (!file){printf("Image could not be opened\n"); return 0;}
 
             if ( fread(header, 1, 54, file)!=54 ){ // If not 54 bytes read : problem
@@ -86,16 +198,22 @@ public:
             m_Textures[name] = textureID;
             return true;
         }
-        void useTexture(string name){
+        static void useTexture(string name){
 
         }
 
-        bool loadSound(string name, string path);
-        void playSound(string name);
+        static void playSound(string name){
+            alSourcePlay(m_Sounds[name]);
+        }
 
 private:
-    map<string,GLuint> m_Textures;
-    map<string,int> m_Sounds;
-};
+    static map<string,GLuint> m_Textures;
+    static map<string,ALuint> m_Sounds;
 
+    static const int NUM_BUFFERS = 32;
+
+    static ALuint m_Buffers[NUM_BUFFERS];
+
+};
+*/
 #endif //SPACEINVADERS3D_ASSETS_H
