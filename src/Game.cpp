@@ -55,10 +55,8 @@ bool Game::init(int sWidth, int sHeight){
 	m_Player->getTransformation()->m_Rotation = Vec3D(0,1,0);
 	//m_Player->playAnimation("moving",2);
 
-	leftBorder = Entity(-320,m_ScreenHeight/2,Vec3D(10,m_ScreenHeight,10));
-	//leftBorder = Entity(-320,0,Vec3D(10,m_ScreenHeight,10));
-	rightBorder = Entity(320,m_ScreenHeight/2,Vec3D(10,m_ScreenHeight,10));
-	//rightBorder = Entity(320,0,Vec3D(10,m_ScreenHeight,10));
+	leftBorder = Entity(-320,0,Vec3D(10,m_ScreenHeight,10));
+	rightBorder = Entity(320,0,Vec3D(10,m_ScreenHeight,10));
 
 
 	Assets::initialize();
