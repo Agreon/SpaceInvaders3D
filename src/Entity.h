@@ -41,18 +41,18 @@ public:
 	}
 
 	Vec3D getAbsoluteTranslation(Entity *entity, Vec3D translation){
+
+		translation += entity->getTransformation()->m_Translation;
+
 		Entity* parent = entity->getParent();
 
 		if(parent == NULL){
-			translation += entity->getTransformation()->m_Translation;
 			return translation;
 		}else{
-			translation += parent->getTransformation()->m_Translation;
 			return getAbsoluteTranslation(parent,translation);
 		}
 	}
 
-	//TODO: Think of maybe centered coordinates :/
 	//TODO: Think of Rotation later
 	Entity* collides(Entity entity){
 
@@ -73,7 +73,7 @@ public:
 		   || (translation.x - scale.x/2 > entity.m_Transformation.m_Translation.x + entity.m_Transformation.m_Scale.x / 2)
 		   || (translation.y + scale.y / 2 < entity.m_Transformation.m_Translation.y - entity.m_Transformation.m_Scale.y /2 )
 		   || (translation.y - scale.y / 2 > entity.m_Transformation.m_Translation.y + entity.m_Transformation.m_Scale.y / 2))
-			return NULL;																					//TODO: Front and back
+			return NULL;																					//TODO: Maybe Front and back
 
 		return this;
 	}
@@ -83,9 +83,9 @@ public:
 		m_Parts.push_back(part);
 	}
 
-	//TODO: Maybe delete old
 	void addPart(string name, Entity *part){
 		part->setParent(this);
+		m_Parts.push_back(part);
 		m_NamedParts[name] = part;
 	}
 
@@ -135,71 +135,47 @@ public:
 		float fSeitenL = 1;
 
 		/*glBegin(GL_POLYGON);   //Vorderseite
-		//glColor4f(1.0f,0.0f,0.0f,1.0f);	//ROT
 		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
-		//glColor4f(1.0f,1.0f,0.0f,1.0f); //GELB
 		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
-		//glColor4f(1.0f,1.0f,1.0f,1.0f); //WEISS
 		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
-		//glColor4f(1.0f,0.0f,1.0f,1.0f); //MAGENTA
 		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
 		glEnd();
 
 
 		glBegin(GL_POLYGON);   //Rechte Seite
-		//glColor4f(1.0f,1.0f,0.0f,1.0f); //GELB
 		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
-		//glColor4f(0.0f,1.0f,0.0f,1.0f); //GRUEN
 		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-		//glColor4f(0.0f,1.0f,1.0f,1.0f);	//CYAN
 		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
-		//glColor4f(1.0f,1.0f,1.0f,1.0f); //WEISS
 		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
 		glEnd();
 
 
 		glBegin(GL_POLYGON);   //Rueckseite
-		//glColor4f(0.0f,1.0f,1.0f,1.0f); //CYAN
 		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
-		//glColor4f(0.0f,1.0f,0.0f,1.0f); //GRUEN
 		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-		//glColor4f(0.0f,0.0f,0.0f,1.0f); //SCHWARZ
 		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-		//glColor4f(0.0f,0.0f,1.0f,1.0f); //BLAU
 		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
 		glEnd();
 
 
 		glBegin(GL_POLYGON);   //Linke Seite
-		//glColor4f(0.0f,0.0f,1.0f,1.0f); //BLAU
 		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
-		//glColor4f(0.0f,0.0f,0.0f,1.0f); //SCHWARZ
 		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-		//glColor4f(1.0f,0.0f,0.0f,1.0f); //ROT
 		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
-		//glColor4f(1.0f,0.0f,1.0f,1.0f); //MAGENTA
 		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
 		glEnd();
 
 		glBegin(GL_POLYGON);   //Deckflaeche
-		//glColor4f(1.0f,0.0f,1.0f,1.0f); //MAGENTA
 		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
-		//glColor4f(1.0f,1.0f,1.0f,1.0f); //WEISS
 		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
-		//glColor4f(0.0f,1.0f,1.0f,1.0f); //CYAN
 		glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
-		//glColor4f(0.0f,0.0f,1.0f,1.0f); //BLAU
 		glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
 		glEnd();
 
 		glBegin(GL_POLYGON);   //Bodenflaeche
-		//glColor4f(0.0f,0.0f,0.0f,1.0f); //SCHWARZ
 		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-		//glColor4f(0.0f,1.0f,0.0f,1.0f); //GRUEN
 		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-		//glColor4f(1.0f,1.0f,0.0f,1.0f); //GELB
 		glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
-		//glColor4f(1.0f,0.0f,0.0f,1.0f); //ROT
 		glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
 		glEnd();*/
 

@@ -23,7 +23,7 @@ bool Game::init(int sWidth, int sHeight){
 		m_Keys[i] = false;
 	}
 
-	m_Player = new Player(0,-100, Vec3D(15,18,10));
+	m_Player = new Player(0,-250, Vec3D(15,18,10));
 	Entity* body = new Entity(0,-20,Vec3D(40,20,10));
 	m_Player->addPart(body);
 
@@ -33,18 +33,18 @@ bool Game::init(int sWidth, int sHeight){
 		}
 	}
 
+	int barricadeSize = 30;
+
 	//Create Barriers
 	for(int i = 0; i < 3; i++){
-		m_Barricades.push_back(new Entity(i*200,-30,0));
+		m_Barricades.push_back(new Entity(i*200,-100,0));
+		m_Barricades[i]->setCollisionEnabled(false);  // Damit immer nur kinder-objekte zerstört werden
 
-		Entity* row1 = new Entity(0,-10,Vec3D(10,10,10));
-		Entity* row2 = new Entity(0,-20,Vec3D(20,10,10));
-		Entity* row3 = new Entity(0,-30,Vec3D(30,10,10));
-		m_Barricades[i]->addPart(row1);
-		m_Barricades[i]->addPart(row2);
-		m_Barricades[i]->addPart(row3);
-
-		m_Barricades[i]->setCollisionEnabled(false);
+		m_Barricades[i]->addPart(new Entity(0,0,barricadeSize));
+		m_Barricades[i]->addPart(new Entity(-barricadeSize,0,barricadeSize));
+		m_Barricades[i]->addPart(new Entity(barricadeSize,0,barricadeSize));
+		m_Barricades[i]->addPart(new Entity(-barricadeSize,-barricadeSize,barricadeSize));
+		m_Barricades[i]->addPart(new Entity(barricadeSize,-barricadeSize,barricadeSize));
 	}
 
 	Animation *playerAnim = new Animation();
@@ -79,20 +79,18 @@ void Game::keyUp(char key){
 	}
 }
 
-//TODO: Vlt. smoothe bewegungen einbauen
 void Game::event(){
 
 	m_Player->update(m_Keys);
 }
 
 /*
- * TODO: Dynamically Enemy Movement
- * Barricade stuff
- * Laser-Barricade collision
+ *
  */
 void Game::update(){
 	event();
 
+	// Spielerlaser
 	for(auto& laser : m_Lasers){
 		laser->update();
 		if(laser->getTransformation()->m_Translation.y > m_ScreenHeight/2){
@@ -100,6 +98,7 @@ void Game::update(){
 		}
 	}
 
+	// Gegnerlaser
 	for(auto& laser : m_EnemyLasers){
 		laser->update();
 		if(laser->getTransformation()->m_Translation.y < -(m_ScreenHeight/2)){
@@ -108,24 +107,23 @@ void Game::update(){
 		Entity *collidingWith = m_Player->collides(*laser);
 		if(collidingWith != NULL){
 			laser->setActive(false);
-			//TODO: Remove one life
+			//TODO: Game Over
 			break;
 		}
 	}
 
-	//TODO: Only lowest row of enemy collision working
+	// Enemy -> Wall Collision
 	for(auto& enemy: m_Enemies){
 		if(enemy->collides(rightBorder)){
-			cout << "Enemy collides with right side" << endl;
 			Enemy::Direction = 'l';
 			break;
 		}else if(enemy->collides(leftBorder)){
-			cout << "Enemy collides with left side" << endl;
 			Enemy::Direction = 'r';
 			break;
 		}
 	}
 
+	// Enemy Update
 	for(auto& enemy : m_Enemies){
 
 		enemy->update();
@@ -143,7 +141,7 @@ void Game::update(){
 		}
 	}
 
-
+	// Enemy Laser -> Barricade Collision
 	for(auto& laser : m_EnemyLasers){
 		for(auto& barricade : m_Barricades){
 
@@ -181,7 +179,7 @@ void Game::update(){
 
 		m_Barricades[i]->deleteInactiveChildren();
 
-		if(m_Barricades[i]->isActive() == false || m_Barricades[i]->getParts()->size() < 1){
+		if(m_Barricades[i]->getParts()->size() < 1){
 			cout << "Finally deleting barricade" << endl;
 			m_Barricades.erase(m_Barricades.begin() + i);
 		}
@@ -194,7 +192,6 @@ void Game::draw(){
 	glLoadIdentity();   // Aktuelle Model-/View-Transformations-Matrix zuruecksetzen
 
 	gluLookAt(0,0,m_ScreenWidth,0,0,0,0,1,0);
-	//gluLookAt(0,0,m_ScreenWidth/2,0,0,0,0,1,0);
 
 	//glRotatef(-45,1,0,0);
 

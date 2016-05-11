@@ -1,5 +1,8 @@
 #TODO
 
+## Kollision
+    + Part-Kollision funktioniert noch nicht so gut
+
 ## Models
     + Player
     + Enemy
@@ -8,6 +11,8 @@
 ## Player
     + Schießen soll nur verzögert funktionieren
         -> Tim
+    + Soll nicht aus Bildschirm raus
+        -> Tim (Schau nach wie ich das bei den Gegnern gemacht habe ;) )
 
 ## Enemy
     +  Stufe nach unten setzen
@@ -19,6 +24,7 @@
 ## Sounds
     + Schuss-Sound
     
+# Second Priority
 
 ## Lichtklasse
     + Erbt von Entity
