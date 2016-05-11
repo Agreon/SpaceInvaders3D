@@ -1,6 +1,9 @@
 #include "Game.h"
 #include "Assets.h"
 
+char Enemy::Direction = 'l';
+
+
 Game::Game()
 {
 }
@@ -26,7 +29,7 @@ bool Game::init(int sWidth, int sHeight){
 
 	for(int i = 0; i < (m_ScreenWidth-150) / 100; i++){
 		for(int j = 0; j < (m_ScreenHeight-200) / 100; j++){
-			m_Enemies.push_back(new Entity(i*50 - (m_ScreenWidth/2) + 200 ,(j*50)-(m_ScreenHeight/2) + 300,10));
+			m_Enemies.push_back(new Enemy(i*50 - (m_ScreenWidth/2) + 200 ,((j*50)-(m_ScreenHeight/2)) + 300,Vec3D(20,20,20)));
 		}
 	}
 
@@ -52,6 +55,12 @@ bool Game::init(int sWidth, int sHeight){
 	m_Player->getTransformation()->m_Rotation = Vec3D(0,1,0);
 	//m_Player->playAnimation("moving",2);
 
+	leftBorder = Entity(-320,m_ScreenHeight/2,Vec3D(10,m_ScreenHeight,10));
+	//leftBorder = Entity(-320,0,Vec3D(10,m_ScreenHeight,10));
+	rightBorder = Entity(320,m_ScreenHeight/2,Vec3D(10,m_ScreenHeight,10));
+	//rightBorder = Entity(320,0,Vec3D(10,m_ScreenHeight,10));
+
+
 	Assets::initialize();
 
 	Assets::loadSound("shoot","./assets/shoot.wav");
@@ -74,23 +83,7 @@ void Game::keyUp(char key){
 
 //TODO: Vlt. smoothe bewegungen einbauen
 void Game::event(){
-/*	if(m_Keys['a']){
-		m_Player->getTransformation()->m_Translation.x -= 2;
-		if(m_Player->getTransformation()->m_Angle > -45)
-			m_Player->getTransformation()->m_Angle -= 2;
 
-	}
-	else if(m_Keys['d']){
-		m_Player->getTransformation()->m_Translation.x += 2;
-		if(m_Player->getTransformation()->m_Angle < 45)
-			m_Player->getTransformation()->m_Angle += 2;
-	}else{
-		if(m_Player->getTransformation()->m_Angle > 0){
-			m_Player->getTransformation()->m_Angle -= 3;
-		}else if(m_Player->getTransformation()->m_Angle < 0){
-			m_Player->getTransformation()->m_Angle += 3;
-		}
-	}*/
 	m_Player->update(m_Keys);
 }
 
@@ -122,8 +115,24 @@ void Game::update(){
 		}
 	}
 
-	// TODO: Collision not working
+	//TODO: Only lowest row of enemy collision working
+	for(auto& enemy: m_Enemies){
+		if(enemy->collides(rightBorder)){
+			cout << "Enemy collides with right side" << endl;
+			Enemy::Direction = 'l';
+			break;
+		}else if(enemy->collides(leftBorder)){
+			cout << "Enemy collides with left side" << endl;
+			Enemy::Direction = 'r';
+			break;
+		}
+	}
+
 	for(auto& enemy : m_Enemies){
+
+		enemy->update();
+
+		// Check collision with lasers
 		for(auto& laser : m_Lasers){
 
 			Entity *collidingWith = enemy->collides(*laser);
@@ -135,6 +144,7 @@ void Game::update(){
 			}
 		}
 	}
+
 
 	for(auto& laser : m_EnemyLasers){
 		for(auto& barricade : m_Barricades){
@@ -185,11 +195,15 @@ void Game::draw(){
 
 	glLoadIdentity();   // Aktuelle Model-/View-Transformations-Matrix zuruecksetzen
 
-	gluLookAt(0,0,m_ScreenWidth/2,0,0,0,0,1,0);
+	gluLookAt(0,0,m_ScreenWidth,0,0,0,0,1,0);
+	//gluLookAt(0,0,m_ScreenWidth/2,0,0,0,0,1,0);
 
 	//glRotatef(-45,1,0,0);
 
 	m_Player->draw();
+
+	leftBorder.draw();
+	rightBorder.draw();
 
 	for(auto& enemy: m_Enemies){
 		enemy->draw();

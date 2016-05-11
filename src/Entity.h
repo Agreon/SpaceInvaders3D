@@ -31,14 +31,13 @@ public:
 	}
 
 	Entity(float x, float y, Vec3D scale){
-		Entity();
+		m_Parent = NULL;
 		m_Active = true;
 		m_Transformation = Transformation(Vec3D(x,y,0),scale);
 		m_CollisionEnabled = true;
 	}
 
 	~Entity(){
-
 	}
 
 	Vec3D getAbsoluteTranslation(Entity *entity, Vec3D translation){
@@ -69,11 +68,13 @@ public:
 		Vec3D translation = getAbsoluteTranslation(this,Vec3D());
 		Vec3D scale = m_Transformation.m_Scale;
 
-		//Check for non-collision on every site
-		if((translation.x > entity.m_Transformation.m_Translation.x + entity.m_Transformation.m_Scale.x)	//Left Side
-		   	|| (translation.x + scale.x < entity.m_Transformation.m_Translation.x )							//Right Side
-		 	|| (translation.y > entity.m_Transformation.m_Translation.y + m_Transformation.m_Scale.y)		//Up Side
-			||(translation.y + scale.y < entity.m_Transformation.m_Translation.y)	)						//Down Side
+		//Check for non-collision on every site TODO: left side coll is not using width of entity
+		if((translation.x > entity.m_Transformation.m_Translation.x + entity.m_Transformation.m_Scale.x)	//if x greater / more right
+		   	|| (translation.x + scale.x < entity.m_Transformation.m_Translation.x )							// if x less / more left Side
+		 //  || (translation.y  < entity.m_Transformation.m_Translation.y + entity.m_Transformation.m_Scale.y)
+		   || (translation.y > entity.m_Transformation.m_Translation.y + m_Transformation.m_Scale.y)		//Up Side
+		//   || (translation.y + scale.y > entity.m_Transformation.m_Translation.y))
+		   ||(translation.y + scale.y < entity.m_Transformation.m_Translation.y)	)						//Down Side
 			return NULL;																					//TODO: Front and back
 
 		return this;
@@ -119,6 +120,7 @@ public:
 		transformation.m_Scale = m_Transformation.m_Scale;
 
 		glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
+		//glTranslatef(transformation.m_Translation.x - transformation.m_Scale.x/2, transformation.m_Translation.y - transformation.m_Scale.y/2, transformation.m_Translation.z - transformation.m_Scale.z/2);
 		glRotatef(transformation.m_Angle, transformation.m_Rotation.x , transformation.m_Rotation.y , transformation.m_Rotation.z);
 		glScalef(transformation.m_Scale.x,transformation.m_Scale.y,transformation.m_Scale.z);
 

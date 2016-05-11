@@ -59,6 +59,47 @@ public:
         m_Transformation.m_Translation.x += m_Velocity;
 
     }
+
+    void draw(Transformation transformation = Transformation()){
+        glPushMatrix();
+
+        for(auto& anim : m_PlayingAnimations){
+            Transformation *animTransformation = anim.second->tick();
+            if(animTransformation == NULL){
+                map<string,Animation*>::iterator it = m_PlayingAnimations.find(anim.first);
+                m_PlayingAnimations.erase(it);
+                continue;
+            }
+            m_Transformation += *animTransformation;
+            //cout << "Adding to scalex " << animTransformation->m_Scale.x << endl;
+            //m_Transformation.m_Scale += animTransformation->m_Scale;
+        }
+
+
+        transformation += m_Transformation;
+        transformation.m_Scale = m_Transformation.m_Scale;
+
+        glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
+        glRotatef(transformation.m_Angle, transformation.m_Rotation.x , transformation.m_Rotation.y , transformation.m_Rotation.z);
+        glScalef(transformation.m_Scale.x,transformation.m_Scale.y,transformation.m_Scale.z);
+
+        glColor3f(0.2,0.9,0.2);
+//        drawBody();
+        //glutWireSphere(1, 30, 30);
+        glutSolidSphere(1,30,30);
+
+        glTranslatef(0, -2,0);
+        glColor3f(0.2,0.2,0.9);
+        glutSolidSphere(0.2,30,30);
+
+
+        glPopMatrix();
+
+        for(auto& part : m_Parts){
+            part->draw(transformation);
+        }
+    }
+
 private:
     float m_Velocity, m_MaxVel, m_Speed;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "Enemy.h"
 #include "Laser.h"
 #include "Player.h"
 
@@ -24,8 +25,10 @@ private:
 	Player *m_Player;
 	vector<Laser*> m_Lasers;
 	vector<Laser*> m_EnemyLasers;
-	vector<Entity*> m_Enemies;
+	vector<Enemy*> m_Enemies;
 	vector<Entity*> m_Barricades;
-	//vector<Entity*> entities;
+
+	Entity leftBorder, rightBorder;
+
 };
 
