@@ -23,9 +23,11 @@ bool Game::init(int sWidth, int sHeight){
 		m_Keys[i] = false;
 	}
 
-	m_Player = new Player(0,-250, Vec3D(15,18,10));
-	Entity* body = new Entity(0,-20,Vec3D(40,20,10));
-	m_Player->addPart(body);
+	m_Player = new Player(0,-250, Vec3D(30,40,10));
+	Entity *wings = new Entity(0,0, Vec3D(120,60,10));
+	//Entity* body = new Entity(0,-40,Vec3D(40,20,10));
+	m_Player->addPart(wings);
+	//m_Player->addPart(wing2);
 
 	for(int i = 0; i < (m_ScreenWidth-150) / 100; i++){
 		for(int j = 0; j < (m_ScreenHeight-200) / 100; j++){
@@ -45,6 +47,15 @@ bool Game::init(int sWidth, int sHeight){
 		m_Barricades[i]->addPart(new Entity(barricadeSize,0,barricadeSize));
 		m_Barricades[i]->addPart(new Entity(-barricadeSize,-barricadeSize,barricadeSize));
 		m_Barricades[i]->addPart(new Entity(barricadeSize,-barricadeSize,barricadeSize));
+
+		Entity *testEntity = new Entity(barricadeSize,barricadeSize,barricadeSize);
+		Animation *testAnim = new Animation();
+		testAnim->addAnimationPart(AnimationPart(Transformation(Vec3D(0,barricadeSize,0),Vec3D(0,0,0)),30));
+		testAnim->addAnimationPart(AnimationPart(Transformation(Vec3D(0,-barricadeSize,0),Vec3D(0,0,0)),30));
+		testEntity->addAnimation("move",testAnim);
+		m_Barricades[i]->addPart(testEntity);
+		testEntity->playAnimation("move",-1);
+
 	}
 
 	Animation *playerAnim = new Animation();
@@ -195,7 +206,9 @@ void Game::draw(){
 
 	//glRotatef(-45,1,0,0);
 
+	glPushMatrix();
 	m_Player->draw();
+	glPopMatrix();
 
 	leftBorder.draw();
 	rightBorder.draw();

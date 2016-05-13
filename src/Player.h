@@ -79,25 +79,35 @@ public:
         transformation += m_Transformation;
         transformation.m_Scale = m_Transformation.m_Scale;
 
-        glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
-        glRotatef(transformation.m_Angle, transformation.m_Rotation.x, transformation.m_Rotation.y , transformation.m_Rotation.z);
-        glScalef(transformation.m_Scale.x,transformation.m_Scale.y,transformation.m_Scale.z);
+        Vec3D parentScale = Vec3D(1,1,1);
+        if(m_Parent != NULL){
+            parentScale = m_Parent->getTransformation()->m_Scale;
+        }
+
+
+          glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
+          glRotatef(transformation.m_Angle, transformation.m_Rotation.x, transformation.m_Rotation.y , transformation.m_Rotation.z);
+          glScalef(transformation.m_Scale.x,transformation.m_Scale.y,transformation.m_Scale.z);
 
         glColor3f(0.2,0.9,0.2);
 //        drawBody();
-        //glutWireSphere(1, 30, 30);
         glutSolidSphere(1,30,30);
 
-        glTranslatef(0, -2,0);
+        // Cockpit
+        //glPushMatrix();
+        glTranslatef(0,0,10 / transformation.m_Scale.z);
+        //glScalef(transformation.m_Scale.x / 20,transformation.m_Scale.y / 20, transformation.m_Scale.z / 20);
+        glScalef(15 / transformation.m_Scale.x, 20 / transformation.m_Scale.y , 10 / transformation.m_Scale.z);
         glColor3f(0.2,0.2,0.9);
-        glutSolidSphere(0.2,30,30);
-
+        glutSolidSphere(1,30,30);
+       // glPopMatrix();
 
         glPopMatrix();
 
         for(auto& part : m_Parts){
             part->draw(transformation);
         }
+        //glPopMatrix();
     }
 
 private:

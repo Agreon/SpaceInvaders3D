@@ -114,11 +114,13 @@ public:
 		}
 
 
+		//transformation = m_Transformation;
 		transformation += m_Transformation;
 		transformation.m_Scale = m_Transformation.m_Scale;
 
 		glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
 		glRotatef(transformation.m_Angle, transformation.m_Rotation.x , transformation.m_Rotation.y , transformation.m_Rotation.z);
+		//glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
 		glScalef(transformation.m_Scale.x,transformation.m_Scale.y,transformation.m_Scale.z);
 
 		glColor3f(1,1,1);
@@ -128,6 +130,7 @@ public:
 		for(auto& part : m_Parts){
 			part->draw(transformation);
 		}
+		//glPopMatrix();
 	}
 
 	void drawBody(){
