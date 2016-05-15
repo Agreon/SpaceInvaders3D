@@ -23,7 +23,7 @@ public:
         m_Transformation = Transformation(Vec3D(x,y,0),scale);
         m_CollisionEnabled = true;
         m_Speed = 0.2;
-        m_MaxVel = 3.2;
+        m_MaxVel = 3.6;
         m_Velocity = 0;
     }
 
@@ -56,8 +56,6 @@ public:
                 m_Transformation.m_Angle += 3;
             }
         }
-        m_Transformation.m_Translation.x += m_Velocity;
-
     }
 
     void draw(Transformation transformation = Transformation()){
@@ -108,6 +106,10 @@ public:
             part->draw(transformation);
         }
         //glPopMatrix();
+    }
+
+    float getVolicty(){
+        return m_Velocity;
     }
 
 private:

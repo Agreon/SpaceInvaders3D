@@ -125,6 +125,7 @@ public:
 
 		glColor3f(1,1,1);
 		drawBody();
+		//glutSolidCube(1);
 		glPopMatrix();
 
 		for(auto& part : m_Parts){

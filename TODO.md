@@ -1,17 +1,12 @@
 #TODO
 
 ## Models
-    + Player
     + Enemy
 
+    
 ## Player
     + Schießen soll nur verzögert funktionieren
         -> Tim
-    + Soll nicht aus Bildschirm raus
-        -> Tim (Schau nach wie ich das bei den Gegnern gemacht habe ;) )
-    + Rotation der Parts funktioniert nicht ganz
-        -> Ich
-        -> glPopMatrix wurde zu früh aufgerufen
 
 ## Enemy
     +  Stufe nach unten setzen
@@ -23,12 +18,12 @@
         -> Tim?
         ->
         for every enemy
-            if random % 10 (evaluieren)
+            if random % [10] => (evaluieren)
                 create laser at pos of enemy
                 break;
         
 ## Animation
-    + testen
+    + funktioniert
      
 ## Sounds
     + Schuss-Sound
@@ -55,9 +50,13 @@
    + Rotation klappt nur part-unabhängig 
       
 
+
 ## Entity
+    + Wenn man Scale als Objektgröße nimmt, muss glScale selbst nochmal in glPush/PopMatrix mit drawBody() eingeschlossen sein
+    + In unserem Anwendungsfall vlt. sinnvoll aber im allgemeinen gibt das .obj die größe eines Objektes vor
     + Farben einstellbar
         + Wie?
+        
         
 ##Allgemein
 + Nochmal nachgucken wie man objekte richtig zerstört
