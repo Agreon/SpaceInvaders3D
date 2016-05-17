@@ -25,7 +25,8 @@ public:
         }else{
             m_Transformation.m_Translation.x += m_Velocity;
         }
-        m_Velocity += 0.005;
+        if(m_Velocity < 8)
+            m_Velocity += 0.005;
     }
     static char Direction;
 

@@ -25,6 +25,8 @@ public:
         m_Speed = 0.2;
         m_MaxVel = 3.6;
         m_Velocity = 0;
+        m_LaserCooldown = 30;
+        m_LaserStatus = 0;
     }
 
     void update(bool chars[]) {
@@ -56,6 +58,8 @@ public:
                 m_Transformation.m_Angle += 3;
             }
         }
+        if(m_LaserStatus > 0)
+            m_LaserStatus--;
     }
 
     void draw(Transformation transformation = Transformation()){
@@ -108,12 +112,25 @@ public:
         //glPopMatrix();
     }
 
+    bool shoot(){
+
+        if(m_LaserStatus > 0)
+            return false;
+
+        getPart("gun")->playAnimation("gunRotation",3);
+
+        m_LaserStatus = m_LaserCooldown;
+
+        return true;
+    }
+
     float getVolicty(){
         return m_Velocity;
     }
 
 private:
     float m_Velocity, m_MaxVel, m_Speed;
+    int m_LaserCooldown, m_LaserStatus;
 
 };
 

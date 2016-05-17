@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdlib.h>
+#include <time.h>
 #include <vector>
 #include "Enemy.h"
 #include "Laser.h"

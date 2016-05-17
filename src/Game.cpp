@@ -20,6 +20,11 @@ bool Game::init(int sWidth, int sHeight){
 	m_ScreenWidth = sWidth;
 	m_ScreenHeight = sHeight;
 
+	gluPerspective(45, sWidth/sHeight, 0.1, 10000.0);
+
+
+	//srand(time(NULL));
+
 	for(int i = 0; i < 256; i++){
 		m_Keys[i] = false;
 	}
@@ -47,7 +52,32 @@ bool Game::init(int sWidth, int sHeight){
 	// Enemies
 	for(int i = 0; i < (m_ScreenWidth-150) / 100; i++){
 		for(int j = 0; j < (m_ScreenHeight-200) / 100; j++){
-			m_Enemies.push_back(new Enemy(i*50 - (m_ScreenWidth/2) + 200 ,((j*50)-(m_ScreenHeight/2)) + 300,Vec3D(20,20,20)));
+
+			Enemy *newEnemy = new Enemy(i*80 - (m_ScreenWidth/2) + 200 ,(j*80) + 100,Vec3D(30,20,10));
+
+			Entity *enemyGun = new Entity(0,-15,Vec3D(8,15,10));
+			Animation *enemyShoot = new Animation();
+			enemyShoot->addAnimationPart(AnimationPart(Transformation(Vec3D(0,5,0),Vec3D(),Vec3D(),0),12));
+			enemyShoot->addAnimationPart(AnimationPart(Transformation(Vec3D(0,-5,0),Vec3D(),Vec3D(),0),20));
+			enemyGun->addAnimation("shoot",enemyShoot);
+			newEnemy->addPart("laserGun",enemyGun);
+
+			// Cockpits
+			newEnemy->addPart("cockpit1",new Entity(5,-4,Vec3D(5,5,5)));
+			newEnemy->getPart("cockpit1")->getTransformation()->m_Translation.z = 5;
+			newEnemy->getPart("cockpit1")->getTransformation()->m_Rotation.y = 1;
+			newEnemy->getPart("cockpit1")->getTransformation()->m_Angle = 90;
+			newEnemy->addPart("cockpit2",new Entity(-5,-4,Vec3D(5,5,5)));
+			newEnemy->getPart("cockpit2")->getTransformation()->m_Translation.z = 5;
+			newEnemy->getPart("cockpit2")->getTransformation()->m_Rotation.y = 1;
+			newEnemy->getPart("cockpit2")->getTransformation()->m_Angle = 90;
+			// Arms
+			newEnemy->addPart(new Entity(18,-5,Vec3D(8,25,10)));
+			newEnemy->addPart(new Entity(-18,-5,Vec3D(8,25,10)));
+
+
+
+			m_Enemies.push_back(newEnemy);
 		}
 	}
 
@@ -55,7 +85,7 @@ bool Game::init(int sWidth, int sHeight){
 
 	// Create Barriers
 	for(int i = 0; i < 3; i++){
-		m_Barricades.push_back(new Entity(i*200,-100,0));
+		m_Barricades.push_back(new Entity(i*200 - 200,-100,0));
 		m_Barricades[i]->setCollisionEnabled(false);  // Damit immer nur kinder-objekte zerstört werden
 
 		m_Barricades[i]->addPart(new Entity(0,0,barricadeSize));
@@ -65,8 +95,11 @@ bool Game::init(int sWidth, int sHeight){
 		m_Barricades[i]->addPart(new Entity(barricadeSize,-barricadeSize,barricadeSize));
 	}
 
+	//leftBorder = Entity(-320 + 20,0,Vec3D(10,m_ScreenHeight,10));
+	//rightBorder = Entity( 320,0,Vec3D(10,m_ScreenHeight,10));
 	leftBorder = Entity(-320,0,Vec3D(10,m_ScreenHeight,10));
 	rightBorder = Entity(320,0,Vec3D(10,m_ScreenHeight,10));
+	//rightBorder = Entity((m_ScreenWidth/2)-(m_ScreenWidth*0.2),0,Vec3D(10,m_ScreenHeight,10));
 
 	Assets::initialize();
 
@@ -95,17 +128,18 @@ void Game::keyDown(char key){
 
 void Game::keyUp(char key){
 	m_Keys[key] = false;
-
-	if(key == 'e'){
-		m_Player->getPart("gun")->playAnimation("gunRotation",2);
-		m_Lasers.push_back(new Laser(m_Player->getTransformation()->m_Translation.x,m_Player->getTransformation()->m_Translation.y + m_Player->getPart("gun")->getTransformation()->m_Translation.y,1));
-		Assets::playSound("shoot");
-	}
 }
 
 void Game::event(){
-
 	m_Player->update(m_Keys);
+
+	if(m_Keys['e']){
+		if(m_Player->shoot()){
+			m_Lasers.push_back(new Laser(m_Player->getTransformation()->m_Translation.x,m_Player->getTransformation()->m_Translation.y + m_Player->getPart("gun")->getTransformation()->m_Translation.y,1));
+			Assets::playSound("shoot");
+		}
+	}
+
 }
 
 /*
@@ -162,19 +196,46 @@ void Game::update(){
 
 	// Enemy -> Wall Collision
 	for(auto& enemy: m_Enemies){
-		if(enemy->collides(rightBorder)){
-			Enemy::Direction = 'l';
-			break;
-		}else if(enemy->collides(leftBorder)){
+
+		if(enemy->collides(leftBorder)){
 			Enemy::Direction = 'r';
+			for(auto& enemyInner : m_Enemies){
+				enemyInner->getTransformation()->m_Translation.y -= 10;
+			}
+			break;
+		}else if(enemy->collides(rightBorder)){
+			Enemy::Direction = 'l';
+			for(auto& enemyInner : m_Enemies){
+				enemyInner->getTransformation()->m_Translation.y -= 10;
+			}
 			break;
 		}
+		/*if(enemy->collides(rightBorder) || enemy->collides(leftBorder)){
+			if(Enemy::Direction == 'l')
+				Enemy::Direction = 'r';
+			else
+				Enemy::Direction = 'l';
+
+			// Set all Enemies down
+			for(auto& enemyInner : m_Enemies){
+				enemyInner->getTransformation()->m_Translation.y -= 10;
+			}
+
+			break;
+		}*/
 	}
 
 	// Enemy Update
 	for(auto& enemy : m_Enemies){
 
 		enemy->update();
+
+		// Shooting 1 to 1000 probability per frame per enemy
+		int random = rand() % 2000;
+		if(random == 42){
+			m_EnemyLasers.push_back(new Laser(enemy->getTransformation()->m_Translation.x + enemy->getTransformation()->m_Scale.x/2,enemy->getTransformation()->m_Translation.y,false));
+			enemy->getPart("laserGun")->playAnimation("shoot",1);
+		}
 
 		// Check collision with lasers
 		for(auto& laser : m_Lasers){
@@ -213,6 +274,15 @@ void Game::update(){
 		}
 	}
 
+	for(int i = 0; i < m_EnemyLasers.size(); i++){
+
+		m_EnemyLasers[i]->deleteInactiveChildren();
+
+		if(m_EnemyLasers[i]->isActive() == false){
+			m_EnemyLasers.erase(m_EnemyLasers.begin() + i);
+		}
+	}
+
 	for(int i = 0; i < m_Enemies.size(); i++){
 
 		m_Enemies[i]->deleteInactiveChildren();
@@ -240,7 +310,11 @@ void Game::draw(){
 
 	glLoadIdentity();   // Aktuelle Model-/View-Transformations-Matrix zuruecksetzen
 
+	/*glColor3f(1,0,0);
+	glutSolidCube(1);
+*/
 	gluLookAt(0,0,m_ScreenWidth,0,0,0,0,1,0);
+//	gluLookAt(0,0,m_ScreenWidth,0,0,0,0,1,0);
 
 	//glRotatef(-45,1,0,0);
 
@@ -257,6 +331,8 @@ void Game::draw(){
 	for (auto& laser : m_Lasers){
 		laser->draw();
 	}
-	glColor3f(1,1,0);
-	glutSolidCube(10);
+
+	for (auto& laser : m_EnemyLasers){
+		laser->draw();
+	}
 }

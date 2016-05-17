@@ -7,6 +7,7 @@ void Init()
 	glEnable(GL_DEPTH_TEST);
 	glClearDepth(1.0);
 	glClearColor(0, 0, 0, 1);
+
 }
 
 void RenderScene() //Zeichenfunktion
@@ -27,7 +28,8 @@ void Reshape(int width,int height)
 
 	glViewport(0, 0, width, height);
 
-	gluPerspective(45, 1, 0.1, 1000.0);
+	gluPerspective(45, width/height, 0.1, 10000.0);
+	//gluPerspective(45, 1, 0.1, 10000.0);
 
 	glMatrixMode(GL_MODELVIEW);
 }
@@ -59,8 +61,9 @@ int main(int argc, char **argv)
 {
    glutInit( &argc, argv );                
    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-   glutInitWindowSize( 800, 600 );         
-   glutCreateWindow( "Terrorisumus" );   
+   glutInitWindowSize( 800, 600 );
+	//1280x1024
+   glutCreateWindow( "Tim und Daniel" );
    glutDisplayFunc( RenderScene );        
    glutReshapeFunc( Reshape );
 
@@ -68,7 +71,7 @@ int main(int argc, char **argv)
    glutKeyboardFunc(&keyboard);
 	glutKeyboardUpFunc(&keyboardUp);
    
-   if (game.init(800,600) == false){
+   if (game.init(800, 600) == false){
 	   cout << "Error" << endl;
 	   return 1;
    }

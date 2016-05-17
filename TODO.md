@@ -1,32 +1,15 @@
 #TODO
 
-## Models
-    + Enemy
+##Enemy-Wall Collision
+    + Beides geht kaputt
 
-    
-## Player
-    + Schießen soll nur verzögert funktionieren
-        -> Tim
-
-## Enemy
-    +  Stufe nach unten setzen
-        -> Tim
-        -> Schau nach wo die gegner die wand berühren
-    + Balancing (Max. geschwindigkeit)
-        -> Tim
-    + Random schießen
-        -> Tim?
-        ->
-        for every enemy
-            if random % [10] => (evaluieren)
-                create laser at pos of enemy
-                break;
-        
-## Animation
-    + funktioniert
-     
 ## Sounds
     + Schuss-Sound
+
+## Player
+    + Tot
+     
+    
     
 # Second Priority
 
