@@ -30,6 +30,8 @@ private:
 	vector<Enemy*> m_Enemies;
 	vector<Entity*> m_Barricades;
 
+	vector<Entity*> m_Stars;
+
 	Entity leftBorder, rightBorder;
 
 };

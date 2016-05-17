@@ -75,8 +75,6 @@ bool Game::init(int sWidth, int sHeight){
 			newEnemy->addPart(new Entity(18,-5,Vec3D(8,25,10)));
 			newEnemy->addPart(new Entity(-18,-5,Vec3D(8,25,10)));
 
-
-
 			m_Enemies.push_back(newEnemy);
 		}
 	}
@@ -100,6 +98,14 @@ bool Game::init(int sWidth, int sHeight){
 	leftBorder = Entity(-320,0,Vec3D(10,m_ScreenHeight,10));
 	rightBorder = Entity(320,0,Vec3D(10,m_ScreenHeight,10));
 	//rightBorder = Entity((m_ScreenWidth/2)-(m_ScreenWidth*0.2),0,Vec3D(10,m_ScreenHeight,10));
+
+	int rX, rY;
+	for(int i = 0; i < 200; i++){
+		rX = rand()%(m_ScreenWidth/2+m_ScreenWidth/2)-m_ScreenWidth/2;
+		rY = rand()%(m_ScreenHeight/2+m_ScreenHeight/2)-m_ScreenHeight/2;
+
+		m_Stars.push_back(new Entity(rX,rY,1));
+	}
 
 	Assets::initialize();
 
@@ -317,6 +323,10 @@ void Game::draw(){
 //	gluLookAt(0,0,m_ScreenWidth,0,0,0,0,1,0);
 
 	//glRotatef(-45,1,0,0);
+
+	for (auto& star: m_Stars){
+		star->draw();
+	}
 
 	m_Player->draw();
 
