@@ -6,12 +6,12 @@
 + Bitte stellen Sie den Ton an!
 
 ## Steuerung
-### Bewegung
+#### Bewegung
 
 Rechts  --> Taste 'A'   
 Links   --> Taste 'B'
 
-### Schuss
+#### Schuss
 
 Taste 'E'
 
