@@ -1,11 +1,5 @@
 #TODO
 
-##Enemy-Wall Collision
-    + Beides geht kaputt
-
-## Sounds
-    + Schuss-Sound
-
 ## Player
     + Tot
  

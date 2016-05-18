@@ -54,6 +54,7 @@ public:
 	}
 
 	//TODO: Think of Rotation later
+	//TODO: If the other object is a multi-part objekt collision does not work
 	Entity* collides(Entity entity){
 
 		for(auto& part: m_Parts){

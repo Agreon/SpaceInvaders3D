@@ -27,6 +27,7 @@ public:
         m_Velocity = 0;
         m_LaserCooldown = 30;
         m_LaserStatus = 0;
+        m_Lives = 3;
     }
 
     void update(bool chars[]) {
@@ -128,9 +129,17 @@ public:
         return m_Velocity;
     }
 
+    void setLives(int lives){
+        m_Lives = lives;
+    }
+
+    int getLives(){
+        return m_Lives;
+    }
+
 private:
     float m_Velocity, m_MaxVel, m_Speed;
-    int m_LaserCooldown, m_LaserStatus;
+    int m_LaserCooldown, m_LaserStatus, m_Lives;
 
 };
 

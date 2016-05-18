@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 #include <vector>
 #include "Enemy.h"
 #include "Laser.h"
@@ -19,6 +20,7 @@ public:
 	void keyUp(char key);
 	void update();
 	void draw();
+	void shutdown();
 private:
 	int m_ScreenWidth, m_ScreenHeight;
 

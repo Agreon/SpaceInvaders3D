@@ -109,7 +109,9 @@ bool Game::init(int sWidth, int sHeight){
 
 	Assets::initialize();
 
-	Assets::loadSound("shoot","./assets/shoot.wav");
+	Assets::loadSound("pew","./gameMusic/pew.wav");
+	Assets::loadSound("explosion","./gameMusic/brauw.wav");
+	Assets::loadSound("gameOver","./gameMusic/GameOver.wav");
 
 	// Light
 
@@ -121,9 +123,6 @@ bool Game::init(int sWidth, int sHeight){
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);*/
 	//glEnable(GL_DEPTH_TEST);
-
-
-
 
 	return true;
 }
@@ -142,7 +141,7 @@ void Game::event(){
 	if(m_Keys['e']){
 		if(m_Player->shoot()){
 			m_Lasers.push_back(new Laser(m_Player->getTransformation()->m_Translation.x,m_Player->getTransformation()->m_Translation.y + m_Player->getPart("gun")->getTransformation()->m_Translation.y,1));
-			Assets::playSound("shoot");
+			Assets::playSound("pew");
 		}
 	}
 
@@ -195,7 +194,10 @@ void Game::update(){
 		// Player collision
 		if(m_Player->collides(*laser) != NULL){
 			laser->setActive(false);
-			//TODO: Game Over
+			m_Player->setLives(m_Player->getLives()-1);
+			if(m_Player->getLives() < 1){
+				Assets::playSound("gameOver");
+			}
 			break;
 		}
 	}
@@ -241,6 +243,7 @@ void Game::update(){
 		if(random == 42){
 			m_EnemyLasers.push_back(new Laser(enemy->getTransformation()->m_Translation.x + enemy->getTransformation()->m_Scale.x/2,enemy->getTransformation()->m_Translation.y,false));
 			enemy->getPart("laserGun")->playAnimation("shoot",1);
+			Assets::playSound("pew");
 		}
 
 		// Check collision with lasers
@@ -251,6 +254,7 @@ void Game::update(){
 			if(collidingWith != NULL){
 				laser->setActive(false);
 				enemy->setActive(false);
+				Assets::playSound("explosion");
 				break;
 			}
 		}
@@ -265,6 +269,15 @@ void Game::update(){
 			if(collidingWith != NULL){
 				collidingWith->setActive(false);
 				laser->setActive(false);
+				break;
+			}
+		}
+	}
+
+	for(auto &enemy : m_Enemies){
+		for(auto &barricade : m_Barricades){
+			if(enemy->collides(*barricade)){
+				barricade->setActive(false);
 				break;
 			}
 		}
@@ -322,7 +335,7 @@ void Game::draw(){
 	gluLookAt(0,0,m_ScreenWidth,0,0,0,0,1,0);
 //	gluLookAt(0,0,m_ScreenWidth,0,0,0,0,1,0);
 
-	//glRotatef(-45,1,0,0);
+	glRotatef(-45,1,0,0);
 
 	for (auto& star: m_Stars){
 		star->draw();
@@ -345,4 +358,8 @@ void Game::draw(){
 	for (auto& laser : m_EnemyLasers){
 		laser->draw();
 	}
+}
+
+void Game::shutdown(){
+	exit(EXIT_SUCCESS);
 }

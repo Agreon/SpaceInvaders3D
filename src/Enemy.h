@@ -16,7 +16,7 @@ public:
         m_Active = true;
         m_Transformation = Transformation(Vec3D(x,y,0),scale);
         m_CollisionEnabled = true;
-        m_Velocity = 0;
+        m_Velocity = 1;
     }
 
     void update(){
@@ -25,7 +25,7 @@ public:
         }else{
             m_Transformation.m_Translation.x += m_Velocity;
         }
-        if(m_Velocity < 8)
+        if(m_Velocity < 4)
             m_Velocity += 0.005;
     }
     static char Direction;
