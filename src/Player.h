@@ -88,9 +88,9 @@ public:
         }
 
 
-          glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
-          glRotatef(transformation.m_Angle, transformation.m_Rotation.x, transformation.m_Rotation.y , transformation.m_Rotation.z);
-          glScalef(transformation.m_Scale.x,transformation.m_Scale.y,transformation.m_Scale.z);
+         glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
+         glRotatef(transformation.m_Angle, transformation.m_Rotation.x, transformation.m_Rotation.y , transformation.m_Rotation.z);
+         glScalef(transformation.m_Scale.x,transformation.m_Scale.y,transformation.m_Scale.z);
 
         glColor3f(0.2,0.9,0.2);
 //        drawBody();

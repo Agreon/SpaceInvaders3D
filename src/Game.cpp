@@ -50,6 +50,7 @@ bool Game::init(int sWidth, int sHeight){
 	// For incline of player movement
 	m_Player->getTransformation()->m_Rotation = Vec3D(0,1,0);
 
+
 	// Enemies
 	for(int i = 0; i < (m_ScreenWidth-150) / 100; i++){
 		for(int j = 0; j < (m_ScreenHeight-200) / 100; j++){
