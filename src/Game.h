@@ -21,6 +21,10 @@ public:
 	void update();
 	void draw();
 	void shutdown();
+
+	int getGameOverCounter(){
+		return m_GameOverCounter;
+	}
 private:
 	int m_ScreenWidth, m_ScreenHeight;
 
@@ -34,7 +38,10 @@ private:
 
 	vector<Entity*> m_Stars;
 
-	Entity leftBorder, rightBorder;
+	Entity m_LeftBorder, m_RightBorder;
+
+	bool m_IsRunning;
+	int m_GameOverCounter;
 
 };
 

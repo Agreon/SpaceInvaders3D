@@ -19,6 +19,11 @@ void RenderScene() //Zeichenfunktion
 	game.draw();
 
 	glutSwapBuffers();
+
+	if(game.getGameOverCounter() > 100){
+		exit(EXIT_SUCCESS);
+	}
+
 }
 
 void Reshape(int width,int height)

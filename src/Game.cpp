@@ -19,11 +19,12 @@ bool Game::init(int sWidth, int sHeight){
 
 	m_ScreenWidth = sWidth;
 	m_ScreenHeight = sHeight;
+	m_IsRunning = true;
+	m_GameOverCounter = 0;
 
 	gluPerspective(45, sWidth/sHeight, 0.1, 10000.0);
 
-
-	//srand(time(NULL));
+	srand(time(NULL));
 
 	for(int i = 0; i < 256; i++){
 		m_Keys[i] = false;
@@ -53,7 +54,7 @@ bool Game::init(int sWidth, int sHeight){
 	for(int i = 0; i < (m_ScreenWidth-150) / 100; i++){
 		for(int j = 0; j < (m_ScreenHeight-200) / 100; j++){
 
-			Enemy *newEnemy = new Enemy(i*80 - (m_ScreenWidth/2) + 200 ,(j*80) + 100,Vec3D(30,20,10));
+			Enemy *newEnemy = new Enemy(i*80 - (m_ScreenWidth/2) + 200 ,(j*80) + 300,Vec3D(30,20,10));
 
 			Entity *enemyGun = new Entity(0,-15,Vec3D(8,15,10));
 			Animation *enemyShoot = new Animation();
@@ -93,16 +94,16 @@ bool Game::init(int sWidth, int sHeight){
 		m_Barricades[i]->addPart(new Entity(barricadeSize,-barricadeSize,barricadeSize));
 	}
 
-	//leftBorder = Entity(-320 + 20,0,Vec3D(10,m_ScreenHeight,10));
-	//rightBorder = Entity( 320,0,Vec3D(10,m_ScreenHeight,10));
-	leftBorder = Entity(-320,0,Vec3D(10,m_ScreenHeight,10));
-	rightBorder = Entity(320,0,Vec3D(10,m_ScreenHeight,10));
-	//rightBorder = Entity((m_ScreenWidth/2)-(m_ScreenWidth*0.2),0,Vec3D(10,m_ScreenHeight,10));
+	//m_LeftBorder = Entity(-320 + 20,0,Vec3D(10,m_ScreenHeight,10));
+	//m_RightBorder = Entity( 320,0,Vec3D(10,m_ScreenHeight,10));
+	m_LeftBorder = Entity(-320, 0, Vec3D(10, m_ScreenHeight, 10));
+	m_RightBorder = Entity(320, 0, Vec3D(10, m_ScreenHeight, 10));
+	//m_RightBorder = Entity((m_ScreenWidth/2)-(m_ScreenWidth*0.2),0,Vec3D(10,m_ScreenHeight,10));
 
 	int rX, rY;
 	for(int i = 0; i < 200; i++){
 		rX = rand()%(m_ScreenWidth/2+m_ScreenWidth/2)-m_ScreenWidth/2;
-		rY = rand()%(m_ScreenHeight/2+m_ScreenHeight/2)-m_ScreenHeight/2;
+		rY = rand()%(m_ScreenHeight/2+m_ScreenHeight/2 + 350)-(m_ScreenHeight/2 + 350) + (350);
 
 		m_Stars.push_back(new Entity(rX,rY,1));
 	}
@@ -144,18 +145,23 @@ void Game::event(){
 			Assets::playSound("pew");
 		}
 	}
-
 }
 
 /*
  *
  */
 void Game::update(){
+
+	if(m_IsRunning == false){
+		m_GameOverCounter++;
+		return;
+	}
+
 	event();
 
 	// Player-Border Collision
-	if((m_Player->getVolicty() < 0 && m_Player->collides(leftBorder) == NULL)
-		|| (m_Player->getVolicty() > 0&& m_Player->collides(rightBorder) == NULL)) {
+	if((m_Player->getVolicty() < 0 && m_Player->collides(m_LeftBorder) == NULL)
+		|| (m_Player->getVolicty() > 0&& m_Player->collides(m_RightBorder) == NULL)) {
 		m_Player->getTransformation()->m_Translation.x += m_Player->getVolicty();
 	}
 
@@ -197,6 +203,7 @@ void Game::update(){
 			m_Player->setLives(m_Player->getLives()-1);
 			if(m_Player->getLives() < 1){
 				Assets::playSound("gameOver");
+				m_IsRunning = false;
 			}
 			break;
 		}
@@ -205,20 +212,20 @@ void Game::update(){
 	// Enemy -> Wall Collision
 	for(auto& enemy: m_Enemies){
 
-		if(enemy->collides(leftBorder)){
+		if(enemy->collides(m_LeftBorder)){
 			Enemy::Direction = 'r';
 			for(auto& enemyInner : m_Enemies){
 				enemyInner->getTransformation()->m_Translation.y -= 10;
 			}
 			break;
-		}else if(enemy->collides(rightBorder)){
+		}else if(enemy->collides(m_RightBorder)){
 			Enemy::Direction = 'l';
 			for(auto& enemyInner : m_Enemies){
 				enemyInner->getTransformation()->m_Translation.y -= 10;
 			}
 			break;
 		}
-		/*if(enemy->collides(rightBorder) || enemy->collides(leftBorder)){
+		/*if(enemy->collides(m_RightBorder) || enemy->collides(m_LeftBorder)){
 			if(Enemy::Direction == 'l')
 				Enemy::Direction = 'r';
 			else
@@ -329,11 +336,9 @@ void Game::draw(){
 
 	glLoadIdentity();   // Aktuelle Model-/View-Transformations-Matrix zuruecksetzen
 
-	/*glColor3f(1,0,0);
-	glutSolidCube(1);
-*/
 	gluLookAt(0,0,m_ScreenWidth,0,0,0,0,1,0);
-//	gluLookAt(0,0,m_ScreenWidth,0,0,0,0,1,0);
+
+	glRotatef(m_GameOverCounter*3.6,0,0,1);
 
 	glRotatef(-45,1,0,0);
 
