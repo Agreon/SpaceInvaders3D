@@ -12,33 +12,11 @@
 
 class AnimationPart{
 public:
-    AnimationPart(Transformation transformationTarget, int frames){
-        m_Transformation = transformationTarget;
+    AnimationPart(Transformation transformationTarget, int frames);
 
-        m_MaxFrames = frames;
-        m_CurrentFrame = 0;
+    void reload();
 
-
-        m_Step.m_Translation = transformationTarget.m_Translation/ frames;
-        m_Step.m_Scale = transformationTarget.m_Scale/ frames;
-        m_Step.m_Rotation = transformationTarget.m_Rotation/ frames;
-        m_Step.m_Angle = transformationTarget.m_Angle / frames;
-       //s m_Step = m_Transformation / frames;
-    }
-
-    void reload(){
-        m_CurrentFrame = 0;
-    }
-
-    Transformation* getTickChange(){
-        if(m_CurrentFrame < m_MaxFrames) {
-            m_CurrentFrame++;
-            return &m_Step;
-        }
-        else
-            return NULL;
-    }
-
+    Transformation* getTickChange();
 private:
     Transformation m_Transformation;
     Transformation m_Step;
@@ -48,48 +26,18 @@ private:
 
 class Animation{
 public:
-    Animation(){
-        m_CurrentPart = 0;
-        m_CurrentLoop = 0;
-        m_MaxLoops = 0;
-    }
+    Animation();
 
-    void addAnimationPart(AnimationPart part){
-        animationParts.push_back(part);
-    }
+    void addAnimationPart(AnimationPart part);
 
     /*
      * @param int : Amount. if -1 endless
      */
-    Transformation* tick(){
+    Transformation* tick();
 
-        if(m_CurrentPart >= animationParts.size()){
-            if(m_CurrentLoop == m_MaxLoops){
-                return NULL;
-            }
-            m_CurrentLoop++;
-            m_CurrentPart = 0;
-            return tick();
-        }else{
-            Transformation *transformation = animationParts[m_CurrentPart].getTickChange();
+    void reload();
 
-            if(transformation == NULL){
-                animationParts[m_CurrentPart].reload();
-                m_CurrentPart++;
-                return tick();
-            }
-            return transformation;
-        }
-    }
-
-    void reload(){
-        m_CurrentLoop = 0;
-        m_CurrentPart = 0;
-    }
-
-    void setMaxLoops(int maxLoops){
-        m_MaxLoops = maxLoops-1;
-    }
+    void setMaxLoops(int maxLoops);
 
 private:
     vector<AnimationPart> animationParts;

@@ -1,5 +1,7 @@
 # SpaceInvaders3D
 
+Bitte schalten sie den Ton an!
+
 ## Bewegung
 
 Rechts  --> Taste 'A'

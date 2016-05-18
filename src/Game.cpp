@@ -50,7 +50,6 @@ bool Game::init(int sWidth, int sHeight){
 	// For incline of player movement
 	m_Player->getTransformation()->m_Rotation = Vec3D(0,1,0);
 
-
 	// Enemies
 	for(int i = 0; i < (m_ScreenWidth-150) / 100; i++){
 		for(int j = 0; j < (m_ScreenHeight-200) / 100; j++){
@@ -97,8 +96,8 @@ bool Game::init(int sWidth, int sHeight){
 
 	//m_LeftBorder = Entity(-320 + 20,0,Vec3D(10,m_ScreenHeight,10));
 	//m_RightBorder = Entity( 320,0,Vec3D(10,m_ScreenHeight,10));
-	m_LeftBorder = Entity(-320, 0, Vec3D(10, m_ScreenHeight, 10));
-	m_RightBorder = Entity(320, 0, Vec3D(10, m_ScreenHeight, 10));
+	m_LeftBorder = Entity(-320, 0, Vec3D(10, m_ScreenHeight*2, 10));
+	m_RightBorder = Entity(320, 0, Vec3D(10, m_ScreenHeight*2, 10));
 	//m_RightBorder = Entity((m_ScreenWidth/2)-(m_ScreenWidth*0.2),0,Vec3D(10,m_ScreenHeight,10));
 
 	int rX, rY;
@@ -119,12 +118,30 @@ bool Game::init(int sWidth, int sHeight){
 
 	float fv[] = {1,1,1};
 
-	/*glShadeModel(GL_SMOOTH);
-	glMaterialfv(GL_FRONT,GL_SPECULAR,fv);
-	glMaterialf(GL_FRONT,GL_SHININESS,50);
+	/*// Ambient light 0.5
+	GLfloat global_ambient[] = { 0.5, 0.5, 0.5, 0.5 };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
+
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat diffuseLight[] = { 1, 1, 1, 1.0 };
+
+	GLfloat mat_shininess[] = { 50.0 };
+	glClearColor (0.0, 0.0, 0.0, 0.0);
+	glShadeModel (GL_SMOOTH);
+
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	//glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseLight);
+
+	GLfloat spec[] = { 0, 0.8, 0, 1};
+	glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+
 	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);*/
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_NORMALIZE);*/
 
 	return true;
 }
@@ -173,7 +190,7 @@ void Game::update(){
 		laser->update();
 
 		// If to far away
-		if(laser->getTransformation()->m_Translation.y > m_ScreenHeight/2){
+		if(laser->getTransformation()->m_Translation.y > m_ScreenHeight*2){
 			laser->setActive(false);
 		}
 
@@ -324,7 +341,6 @@ void Game::update(){
 		m_Barricades[i]->deleteInactiveChildren();
 
 		if(m_Barricades[i]->getParts()->size() < 1){
-			cout << "Finally deleting barricade" << endl;
 			m_Barricades.erase(m_Barricades.begin() + i);
 		}
 	}
@@ -342,6 +358,14 @@ void Game::draw(){
 	glRotatef(m_GameOverCounter*3.6,0,0,1);
 
 	glRotatef(-45,1,0,0);
+
+	/*GLfloat lightPos[] = {m_Player->getTransformation()->m_Translation.x,m_Player->getTransformation()->m_Translation.y,50,1};
+	glPushMatrix();
+	glScalef(10,10,10);
+	glTranslatef(lightPos[0],lightPos[1],lightPos[2]);
+	glutWireCube(1);
+	glPopMatrix();
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);*/
 
 	for (auto& star: m_Stars){
 		star->draw();
@@ -364,8 +388,4 @@ void Game::draw(){
 	for (auto& laser : m_EnemyLasers){
 		laser->draw();
 	}
-}
-
-void Game::shutdown(){
-	exit(EXIT_SUCCESS);
 }

@@ -20,7 +20,6 @@ public:
 	void keyUp(char key);
 	void update();
 	void draw();
-	void shutdown();
 
 	int getGameOverCounter(){
 		return m_GameOverCounter;
