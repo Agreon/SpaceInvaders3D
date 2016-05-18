@@ -21,6 +21,7 @@ Taste 'E'
 + GameOver Funktion --> Player hat 3 Leben, wird er 3 mal getroffen wird das Programm beendet.
 + Lichtquelle ist der Playerlaser.
 + Texturen im Hintergrund.
++ Bewegung von Objekten: Die Kanone des Players rotiert, die Kanone der Gegner bewegen sich bei Abschuss hin und her.
 
 
 ## Anhang
