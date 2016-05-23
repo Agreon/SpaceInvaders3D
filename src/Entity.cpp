@@ -8,26 +8,19 @@ Entity::Entity(){
     m_Active = true;
     m_Parent = NULL;
     m_CollisionEnabled = true;
+    m_Color = Vec3D(-1,-1,-1);
 }
 
-Entity::Entity(float x, float y){
-    m_Active = true;
+Entity::Entity(float x, float y) : Entity(){
     m_Transformation = Transformation(Vec3D(x,y,0),Vec3D(1,1,1));
-    m_CollisionEnabled = true;
 }
 
-Entity::Entity(float x, float y, float size){
-    Entity();
-    m_Active = true;
-    m_Transformation = Transformation(Vec3D(x,y,0),Vec3D(size,size,size));
-    m_CollisionEnabled = true;
+Entity::Entity(float x, float y, float size) : Entity(x,y){
+    m_Transformation.m_Scale = Vec3D(size,size,size);
 }
 
-Entity::Entity(float x, float y, Vec3D scale){
-    m_Parent = NULL;
-    m_Active = true;
-    m_Transformation = Transformation(Vec3D(x,y,0),scale);
-    m_CollisionEnabled = true;
+Entity::Entity(float x, float y, Vec3D scale) : Entity(x,y){
+    m_Transformation.m_Scale = scale;
 }
 
 Entity::~Entity(){
@@ -117,10 +110,14 @@ void Entity::draw(Transformation transformation){
     //glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
     glScalef(transformation.m_Scale.x,transformation.m_Scale.y,transformation.m_Scale.z);
 
-    glColor3f(1,1,1);
-    drawBody();
-    //glColor3f(1,0,0);
-    //glutSolidCube(1);
+    if(m_Color.x == -1){
+        drawBody();
+    }else{
+        glColor3f(m_Color.x,m_Color.y,m_Color.z);
+        glutSolidCube(1);
+    }
+   // glColor3f(1,0,0);
+   // glutSolidCube(1);
     glPopMatrix();
 
     for(auto& part : m_Parts){
@@ -132,51 +129,6 @@ void Entity::draw(Transformation transformation){
 void Entity::drawBody(){
 
     float fSeitenL = 1;
-
-    /*glBegin(GL_POLYGON);   //Vorderseite
-    glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
-    glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
-    glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
-    glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
-    glEnd();
-
-
-    glBegin(GL_POLYGON);   //Rechte Seite
-    glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
-    glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-    glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
-    glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
-    glEnd();
-
-
-    glBegin(GL_POLYGON);   //Rueckseite
-    glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
-    glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-    glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-    glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
-    glEnd();
-
-
-    glBegin(GL_POLYGON);   //Linke Seite
-    glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
-    glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-    glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
-    glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
-    glEnd();
-
-    glBegin(GL_POLYGON);   //Deckflaeche
-    glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
-    glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
-    glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
-    glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
-    glEnd();
-
-    glBegin(GL_POLYGON);   //Bodenflaeche
-    glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-    glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,-fSeitenL/2.0f);
-    glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
-    glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
-    glEnd();*/
 
     glBegin(GL_POLYGON);   //Vorderseite
     glNormal3f(0,0,1);
@@ -192,6 +144,7 @@ void Entity::drawBody(){
 
 
     glBegin(GL_POLYGON);   //Rechte Seite
+    glNormal3f(1,0,0);
     glColor4f(1.0f,1.0f,0.0f,1.0f); //GELB
     glVertex3f(+fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
     glColor4f(0.0f,1.0f,0.0f,1.0f); //GRUEN
@@ -204,6 +157,7 @@ void Entity::drawBody(){
 
 
     glBegin(GL_POLYGON);   //Rueckseite
+    glNormal3f(0,0,-1);
     glColor4f(0.0f,1.0f,1.0f,1.0f); //CYAN
     glVertex3f(+fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
     glColor4f(0.0f,1.0f,0.0f,1.0f); //GRUEN
@@ -216,6 +170,7 @@ void Entity::drawBody(){
 
 
     glBegin(GL_POLYGON);   //Linke Seite
+    glNormal3f(-1,0,0);
     glColor4f(0.0f,0.0f,1.0f,1.0f); //BLAU
     glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,-fSeitenL/2.0f);
     glColor4f(0.0f,0.0f,0.0f,1.0f); //SCHWARZ
@@ -227,6 +182,7 @@ void Entity::drawBody(){
     glEnd();
 
     glBegin(GL_POLYGON);   //Deckflaeche
+    glNormal3f(0,1,0);
     glColor4f(1.0f,0.0f,1.0f,1.0f); //MAGENTA
     glVertex3f(-fSeitenL/2.0f,+fSeitenL/2.0f,+fSeitenL/2.0f);
     glColor4f(1.0f,1.0f,1.0f,1.0f); //WEISS
@@ -252,6 +208,10 @@ void Entity::drawBody(){
     glVertex3f(-fSeitenL/2.0f,-fSeitenL/2.0f,+fSeitenL/2.0f);
     glEnd();
 
+}
+
+void Entity::setColor(Vec3D color){
+    m_Color = color;
 }
 
 void Entity::setActive(bool a){

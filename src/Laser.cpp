@@ -5,7 +5,7 @@
 
 Laser::Laser(float x, float y, bool dir) {
     Entity();
-    m_Transformation = Transformation(Vec3D(x, y, 0), Vec3D(10, 20, 5));
+    m_Transformation = Transformation(Vec3D(x, y, 0), Vec3D(10, 20, 10));
     m_Direction = dir;
 }
 

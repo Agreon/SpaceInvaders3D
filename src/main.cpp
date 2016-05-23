@@ -20,7 +20,7 @@ void RenderScene() //Zeichenfunktion
 
 	glutSwapBuffers();
 
-	if(game.getGameOverCounter() > 100){
+	if(game.getGameOverCounter() > 100 || game.getGameWonCounter() > 220){
 		exit(EXIT_SUCCESS);
 	}
 

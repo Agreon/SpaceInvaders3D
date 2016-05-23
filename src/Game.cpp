@@ -1,6 +1,5 @@
 #include "Game.h"
 #include "Assets.h"
-#include "Light.h"
 
 char Enemy::Direction = 'l';
 
@@ -21,6 +20,7 @@ bool Game::init(int sWidth, int sHeight){
 	m_ScreenHeight = sHeight;
 	m_IsRunning = true;
 	m_GameOverCounter = 0;
+	m_GameWonCounter = 0;
 
 	gluPerspective(45, sWidth/sHeight, 0.1, 10000.0);
 
@@ -56,6 +56,7 @@ bool Game::init(int sWidth, int sHeight){
 
 			Enemy *newEnemy = new Enemy(i*80 - (m_ScreenWidth/2) + 200 ,(j*80) + 300,Vec3D(30,20,10));
 
+			// Gun with Animation
 			Entity *enemyGun = new Entity(0,-15,Vec3D(8,15,10));
 			Animation *enemyShoot = new Animation();
 			enemyShoot->addAnimationPart(AnimationPart(Transformation(Vec3D(0,5,0),Vec3D(),Vec3D(),0),12));
@@ -100,6 +101,7 @@ bool Game::init(int sWidth, int sHeight){
 	m_RightBorder = Entity(320, 0, Vec3D(10, m_ScreenHeight*2, 10));
 	//m_RightBorder = Entity((m_ScreenWidth/2)-(m_ScreenWidth*0.2),0,Vec3D(10,m_ScreenHeight,10));
 
+	// Stars in Background
 	int rX, rY;
 	for(int i = 0; i < 200; i++){
 		rX = rand()%(m_ScreenWidth/2+m_ScreenWidth/2)-m_ScreenWidth/2;
@@ -113,13 +115,14 @@ bool Game::init(int sWidth, int sHeight){
 	Assets::loadSound("pew","./gameMusic/pew.wav");
 	Assets::loadSound("explosion","./gameMusic/brauw.wav");
 	Assets::loadSound("gameOver","./gameMusic/GameOver.wav");
+	Assets::loadSound("win","./gameMusic/win.wav");
 
 	// Light
 
-	float fv[] = {1,1,1};
+	float fv[] = {1,1,1,0};
 
-	/*// Ambient light 0.5
-	GLfloat global_ambient[] = { 0.5, 0.5, 0.5, 0.5 };
+	// Ambient light 0.5
+	GLfloat global_ambient[] = { 0.85, 0.85, 0.85, 0.85 };
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
 
 	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -141,7 +144,7 @@ bool Game::init(int sWidth, int sHeight){
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_NORMALIZE);*/
+	glEnable(GL_NORMALIZE);
 
 	return true;
 }
@@ -159,7 +162,8 @@ void Game::event(){
 
 	if(m_Keys['e']){
 		if(m_Player->shoot()){
-			m_Lasers.push_back(new Laser(m_Player->getTransformation()->m_Translation.x,m_Player->getTransformation()->m_Translation.y + m_Player->getPart("gun")->getTransformation()->m_Translation.y,1));
+			m_Lasers.push_back(new Laser(m_Player->getTransformation()->m_Translation.x,m_Player->getTransformation()->m_Translation.y + m_Player->getPart("gun")->getTransformation()->m_Translation.y,5));
+			m_Lasers.back()->setColor(Vec3D(0,1,0));
 			Assets::playSound("pew");
 		}
 	}
@@ -171,7 +175,10 @@ void Game::event(){
 void Game::update(){
 
 	if(m_IsRunning == false){
-		m_GameOverCounter++;
+		if(m_GameOverCounter > 0)
+			m_GameOverCounter++;
+		else
+			m_GameWonCounter++;
 		return;
 	}
 
@@ -222,6 +229,7 @@ void Game::update(){
 			if(m_Player->getLives() < 1){
 				Assets::playSound("gameOver");
 				m_IsRunning = false;
+				m_GameOverCounter = 1;
 			}
 			break;
 		}
@@ -267,6 +275,7 @@ void Game::update(){
 		int random = rand() % 2000;
 		if(random == 42){
 			m_EnemyLasers.push_back(new Laser(enemy->getTransformation()->m_Translation.x + enemy->getTransformation()->m_Scale.x/2,enemy->getTransformation()->m_Translation.y,false));
+			m_EnemyLasers.back()->setColor(Vec3D(1,0,0));
 			enemy->getPart("laserGun")->playAnimation("shoot",1);
 			Assets::playSound("pew");
 		}
@@ -286,12 +295,12 @@ void Game::update(){
 	}
 
 	// Enemy Laser -> Barricade Collision
-	for(auto& laser : m_EnemyLasers){
-		for(auto& barricade : m_Barricades){
+	for(auto& laser : m_EnemyLasers) {
+		for (auto &barricade : m_Barricades) {
 
 			Entity *collidingWith = barricade->collides(*laser);
 
-			if(collidingWith != NULL){
+			if (collidingWith != NULL) {
 				collidingWith->setActive(false);
 				laser->setActive(false);
 				break;
@@ -299,14 +308,7 @@ void Game::update(){
 		}
 	}
 
-	for(auto &enemy : m_Enemies){
-		for(auto &barricade : m_Barricades){
-			if(enemy->collides(*barricade)){
-				barricade->setActive(false);
-				break;
-			}
-		}
-	}
+	// Deleting of objects if they are inactive
 
 	//TODO: Maybe delete objekt with children
 	for(int i = 0; i < m_Lasers.size(); i++){
@@ -336,6 +338,12 @@ void Game::update(){
 		}
 	}
 
+	if(m_Enemies.size() == 0){
+		m_IsRunning = false;
+		m_GameWonCounter = 1;
+		Assets::playSound("win");
+	}
+
 	for(int i = 0; i < m_Barricades.size(); i++){
 
 		m_Barricades[i]->deleteInactiveChildren();
@@ -359,13 +367,15 @@ void Game::draw(){
 
 	glRotatef(-45,1,0,0);
 
-	/*GLfloat lightPos[] = {m_Player->getTransformation()->m_Translation.x,m_Player->getTransformation()->m_Translation.y,50,1};
-	glPushMatrix();
-	glScalef(10,10,10);
-	glTranslatef(lightPos[0],lightPos[1],lightPos[2]);
-	glutWireCube(1);
-	glPopMatrix();
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);*/
+	if(m_Lasers.size() > 0){
+		glEnable(GL_LIGHT0);
+		GLfloat lightPos[] = {m_Lasers.back()->getTransformation()->m_Translation.x,
+							  m_Lasers.back()->getTransformation()->m_Translation.y,
+							  m_Lasers.back()->getTransformation()->m_Translation.z,1};
+		glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+	}else{
+		glDisable(GL_LIGHT0);
+	}
 
 	for (auto& star: m_Stars){
 		star->draw();

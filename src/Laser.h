@@ -12,6 +12,8 @@ public:
     Laser(float x, float y, bool dir);
     void update();
 
+    void drawBody();
+
 private:
     bool m_Direction;
 };

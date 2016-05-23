@@ -40,6 +40,7 @@ public:
 
 	void deleteInactiveChildren();
 
+	void setColor(Vec3D color);
 	void setCollisionEnabled(bool b);
 	void setActive(bool a);
 	bool isActive();
@@ -50,6 +51,7 @@ protected:
 	void drawBody();
 
 	Transformation m_Transformation;
+	Vec3D m_Color;
 
 	Entity* m_Parent;
 	vector<Entity*> m_Parts;

@@ -24,6 +24,11 @@ public:
 	int getGameOverCounter(){
 		return m_GameOverCounter;
 	}
+
+	int getGameWonCounter(){
+		return m_GameWonCounter;
+	}
+
 private:
 	int m_ScreenWidth, m_ScreenHeight;
 
@@ -41,6 +46,7 @@ private:
 
 	bool m_IsRunning;
 	int m_GameOverCounter;
+	int m_GameWonCounter;
 
 };
 
