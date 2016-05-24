@@ -13,10 +13,14 @@ Rechts  --> Taste 'A'
 
 Taste 'E'
 
+### Sonstiges
+
+Beenden 'ESC'
+
 ## Zusatz
 + Audio über AudioLibary (AL) eingebunden, Aufnahmen eigentständig durchgeführt.
 + GameOver Funktion --> Player hat 3 Leben, wird er 3 mal getroffen wird das Programm beendet.
-+ Lichtquelle ist der Playerlaser.
++ Lichtquelle ist der Playerlase, Abschusslicht (sieht man an den Barrikaden und am Cockpit aufleuchten).
 + Texturen im Hintergrund.
 + Bewegung von Objekten: Die Kanone des Players rotiert, die Kanone der Gegner bewegen sich bei Abschuss hin und her.
 
