@@ -39,7 +39,7 @@ Animation::Animation(){
 }
 
 void Animation::addAnimationPart(AnimationPart part){
-    animationParts.push_back(part);
+	m_AnimationParts.push_back(part);
 }
 
 /*
@@ -47,7 +47,7 @@ void Animation::addAnimationPart(AnimationPart part){
  */
 Transformation* Animation::tick(){
 
-    if(m_CurrentPart >= animationParts.size()){
+	if (m_CurrentPart >= m_AnimationParts.size()){
         if(m_CurrentLoop == m_MaxLoops){
             return NULL;
         }
@@ -55,10 +55,10 @@ Transformation* Animation::tick(){
         m_CurrentPart = 0;
         return tick();
     }else{
-        Transformation *transformation = animationParts[m_CurrentPart].getTickChange();
+		Transformation *transformation = m_AnimationParts[m_CurrentPart].getTickChange();
 
         if(transformation == NULL){
-            animationParts[m_CurrentPart].reload();
+			m_AnimationParts[m_CurrentPart].reload();
             m_CurrentPart++;
             return tick();
         }

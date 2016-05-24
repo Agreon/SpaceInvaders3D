@@ -40,7 +40,7 @@ public:
     void setMaxLoops(int maxLoops);
 
 private:
-    vector<AnimationPart> animationParts;
+    vector<AnimationPart> m_AnimationParts;
     int m_CurrentPart, m_CurrentLoop, m_MaxLoops;
 };
 
