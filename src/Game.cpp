@@ -43,10 +43,6 @@ bool Game::init(int sWidth, int sHeight){
 	Entity *wings = new Entity(0,0, Vec3D(120,40,10));
 	m_Player->addPart(wings);
 
-	// Light
-	Light *light = new Light(0,0);
-	m_Player->addPart(light);
-
 	// For incline of player movement
 	m_Player->getTransformation()->m_Rotation = Vec3D(0,1,0);
 
@@ -118,8 +114,6 @@ bool Game::init(int sWidth, int sHeight){
 	Assets::loadSound("win","./gameMusic/win.wav");
 
 	// Light
-
-	float fv[] = {1,1,1,0};
 
 	// Ambient light 0.5
 	GLfloat global_ambient[] = { 0.85, 0.85, 0.85, 0.85 };
@@ -251,19 +245,6 @@ void Game::update(){
 			}
 			break;
 		}
-		/*if(enemy->collides(m_RightBorder) || enemy->collides(m_LeftBorder)){
-			if(Enemy::Direction == 'l')
-				Enemy::Direction = 'r';
-			else
-				Enemy::Direction = 'l';
-
-			// Set all Enemies down
-			for(auto& enemyInner : m_Enemies){
-				enemyInner->getTransformation()->m_Translation.y -= 10;
-			}
-
-			break;
-		}*/
 	}
 
 	// Enemy Update
