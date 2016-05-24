@@ -85,14 +85,15 @@ vector<Entity*>* Entity::getParts(){
 }
 
 // Draw with parent pos + offset of part
+// TODO: Shooting brings lags
 void Entity::draw(Transformation transformation){
     glPushMatrix();
 
     for(auto& anim : m_PlayingAnimations){
         Transformation *animTransformation = anim.second->tick();
         if(animTransformation == NULL){
-            map<string,Animation*>::iterator it = m_PlayingAnimations.find(anim.first);
-            m_PlayingAnimations.erase(it);
+            //map<string,Animation*>::iterator it = m_PlayingAnimations.find(anim.first);
+           // m_PlayingAnimations.erase(it);
             continue;
         }
         m_Transformation += *animTransformation;

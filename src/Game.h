@@ -2,7 +2,11 @@
 
 #include <stdlib.h>
 #include <time.h>
+
+#ifndef _WIN32
 #include <unistd.h>
+#endif
+
 #include <vector>
 #include "Enemy.h"
 #include "Laser.h"
