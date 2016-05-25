@@ -34,4 +34,7 @@
 ## Hinweise
 + Design: Das Design wurde nicht zu 100% so umgesetzt wie bei dem Prototypen (siehe Anhang "Objekt-Design") geplant.
 Barrikade: Leuchten nicht auf, weil wir ein Licht für das Projektil benutzen, es wird stattdessen der Destroy-Sound bei einem Treffer wiedergegeben.
-Gegner: Haben keine sich bewegenden Arme, da die Kanone eine Bewegung besitzt und die Optik durch zu viel Bewegungen gestört wird.
++ Gegner
+  + Haben keine sich bewegenden Arme, da die Kanone eine Bewegung besitzt und die Optik durch zu viel Bewegungen gestört wird.
+
+
