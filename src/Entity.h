@@ -7,7 +7,10 @@
 #include "util.h"
 #include "Animation.h"
 
-
+/*
+ * An Entity is the basic object of the game world.
+ * Every Game Object can consist of multiple entities, defined as children/parts.
+ */
 class Entity {
 public:
 	Entity();
@@ -26,7 +29,6 @@ public:
 
 	vector<Entity*> *getParts();
 
-	// Draw with parent pos + offset of part
 	void draw(Transformation transformation = Transformation());
 
 	void setTransformation(Transformation transformation);

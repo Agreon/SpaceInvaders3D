@@ -5,8 +5,9 @@
 #ifndef SPACEINVADERS3D_UTIL_H
 #define SPACEINVADERS3D_UTIL_H
 
-using namespace std;
-
+/*
+ * Position in 3D-Space
+ */
 class Vec3D{
 public:
     Vec3D();
@@ -19,7 +20,10 @@ public:
 };
 
 
-
+/*
+ * Basic Transformation.
+ * Attributes are Translation, Scale, Rotation+Angle
+ */
 class Transformation{
 public:
     Transformation(Vec3D translation = Vec3D(), Vec3D scale = Vec3D(), Vec3D rotation = Vec3D(), float angle = 0);

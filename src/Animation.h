@@ -10,6 +10,9 @@
 #include <iostream>
 #include "util.h"
 
+/*
+ * Every AnimationPart has a defined transformation which is applied in a defined amount of frames.
+ */
 class AnimationPart{
 public:
     AnimationPart(Transformation transformationTarget, int frames);
@@ -18,21 +21,20 @@ public:
 
     Transformation* getTickChange();
 private:
-    Transformation m_Transformation;
     Transformation m_Step;
 
     int m_CurrentFrame, m_MaxFrames;
 };
 
+/*
+ * One Animation consists of AnimationParts which are called one after another
+ */
 class Animation{
 public:
     Animation();
 
     void addAnimationPart(AnimationPart part);
 
-    /*
-     * @param int : Amount. if -1 endless
-     */
     Transformation* tick();
 
     void reload();

@@ -19,9 +19,12 @@ public:
 	~Game();
 
 	bool init(int sWidth, int sHeight);
+	// Handling of input
 	void event();
+	// KeyDown and Up get called from glut
 	void keyDown(char key);
 	void keyUp(char key);
+
 	void update();
 	void draw();
 
@@ -46,6 +49,7 @@ private:
 
 	vector<Entity*> m_Stars;
 
+	// Are used for collision with walls
 	Entity m_LeftBorder, m_RightBorder;
 
 	bool m_IsRunning;

@@ -4,23 +4,21 @@
 #include "Animation.h"
 
 AnimationPart::AnimationPart(Transformation transformationTarget, int frames){
-        m_Transformation = transformationTarget;
-
         m_MaxFrames = frames;
         m_CurrentFrame = 0;
-
 
         m_Step.m_Translation = transformationTarget.m_Translation/ frames;
         m_Step.m_Scale = transformationTarget.m_Scale/ frames;
         m_Step.m_Rotation = transformationTarget.m_Rotation/ frames;
-        m_Step.m_Angle = transformationTarget.m_Angle / frames;
-       //s m_Step = m_Transformation / frames;
-}
+        m_Step.m_Angle = transformationTarget.m_Angle / frames; }
 
 void AnimationPart::reload(){
     m_CurrentFrame = 0;
 }
 
+/*
+ * Returns the Transformation for one frame
+ */
 Transformation* AnimationPart::getTickChange(){
     if(m_CurrentFrame < m_MaxFrames) {
         m_CurrentFrame++;
@@ -43,7 +41,7 @@ void Animation::addAnimationPart(AnimationPart part){
 }
 
 /*
- * @param int : Amount. if -1 endless
+ * Evaluates the current animationpart and returns the Transformation of a single frame.
  */
 Transformation* Animation::tick(){
 

@@ -12,6 +12,10 @@ public:
     Enemy(float x, float y, Vec3D scale);
 
     void update();
+
+    /*
+     * All Enemies behave depending on that static variable
+     */
     static char Direction;
 
 private:

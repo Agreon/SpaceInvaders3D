@@ -47,6 +47,9 @@ namespace Assets{
 
 using namespace std;
 
+/*
+ * "Static" Asset class at the moment only for playing sounds
+ */
 namespace Assets{
 
 	map<string,GLuint> m_Textures;
@@ -55,7 +58,7 @@ namespace Assets{
     bool initialize(){
 
         //alutInit(0, NULL);
-       /* alutInitWithoutContext(NULL,NULL);    //TODO: Ausprobieren falls es nicht klappt
+       alutInitWithoutContext(NULL,NULL);    //TODO: Ausprobieren falls es nicht klappt
         alGetError();
 
         ALCcontext *context;
@@ -69,7 +72,7 @@ namespace Assets{
         }
 
         context = alcCreateContext(device,NULL);
-        alcMakeContextCurrent(context);*/
+        alcMakeContextCurrent(context);
 		return true;
     }
 
@@ -77,7 +80,7 @@ namespace Assets{
      * TODO: 1 size is maybe not variable
      */
     void shutdown(){
-       /* for(auto& sound : m_Sounds){
+        for(auto& sound : m_Sounds){
             alDeleteSources(1, &sound.second);
         }
 
@@ -91,12 +94,12 @@ namespace Assets{
 
         alcCloseDevice(device);
 
-        alutExit();*/
+        alutExit();
     }
 
     bool loadSound(string name, string path){
 
-       /* ALuint buffer, source;
+        ALuint buffer, source;
 
         //https://wiki.delphigl.com/index.php/alutCreateBufferFromFile
         buffer = alutCreateBufferFromFile(path.c_str());
@@ -112,18 +115,18 @@ namespace Assets{
 
         cout << "Loaded Sound " << name << endl;
 
-        m_Sounds[name] = source;*/
+        m_Sounds[name] = source;
 		return true;
     }
 
     void playSound(string name){
-       /* cout << "Playing sound " << name << endl;
-        alSourcePlay(m_Sounds[name]);*/
+        cout << "Playing sound " << name << endl;
+        alSourcePlay(m_Sounds[name]);
     }
 
     void stopSound(string name){
-     /*   cout << "Playing sound " << name << endl;
-        alSourceStop(m_Sounds[name]);*/
+        cout << "Playing sound " << name << endl;
+        alSourceStop(m_Sounds[name]);
     }
 
 }

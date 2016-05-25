@@ -24,7 +24,12 @@ Player::Player(float x, float y, Vec3D scale){
     m_Lives = 3;
 }
 
+/*
+ * Checks if player should be moved in one direction or not and uses smooth movement(m_Velocity).
+ * Also the Object is rotatet until a maximum of 45 degress.
+ */
 void Player::update(bool chars[]) {
+
     if(chars['a']) {
         if(m_Velocity > -m_MaxVel)
             m_Velocity -= m_Speed;
@@ -53,10 +58,16 @@ void Player::update(bool chars[]) {
             m_Transformation.m_Angle += 3;
         }
     }
+    // Reloading of laser cannon
     if(m_LaserStatus > 0)
         m_LaserStatus--;
 }
 
+/*
+ * Draws a Entity with optional offset from parent.
+ * If an Animation is active, the frames transformation is added as well.
+ * TODO: Shooting brings lags
+ */
 void Player::draw(Transformation transformation){
     glPushMatrix();
 
@@ -107,6 +118,9 @@ void Player::draw(Transformation transformation){
     //glPopMatrix();
 }
 
+/*
+ * Checks if shooting is allowed and starts animation if so
+ */
 bool Player::shoot(){
 
     if(m_LaserStatus > 0)

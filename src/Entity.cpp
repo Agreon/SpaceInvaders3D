@@ -26,6 +26,10 @@ Entity::Entity(float x, float y, Vec3D scale) : Entity(x,y){
 Entity::~Entity(){
 }
 
+/*
+ * Recursive function that sums up the absolute translation of a part.
+ * Is used for calculation purposes.
+ */
 Vec3D Entity::getAbsoluteTranslation(Entity *entity, Vec3D translation){
 
     translation += entity->getTransformation()->m_Translation;
@@ -39,8 +43,10 @@ Vec3D Entity::getAbsoluteTranslation(Entity *entity, Vec3D translation){
     }
 }
 
-//TODO: Think of Rotation later
-//TODO: If the other object is a multi-part objekt collision does not work
+/*
+ * Checks if object or its parts collide with an enity. If so, a pointer to the colliding part is returned.
+ * TODO: If the other object is a multi-part objekt collision does not work
+ */
 Entity* Entity::collides(Entity entity){
 
     for(auto& part: m_Parts){
@@ -84,8 +90,11 @@ vector<Entity*>* Entity::getParts(){
     return &m_Parts;
 }
 
-// Draw with parent pos + offset of part
-// TODO: Shooting brings lags
+/*
+ * Draws a Entity with optional offset from parent.
+ * If an Animation is active, the frames transformation is added as well.
+ * TODO: Shooting brings lags
+ */
 void Entity::draw(Transformation transformation){
     glPushMatrix();
 
@@ -108,7 +117,6 @@ void Entity::draw(Transformation transformation){
 
     glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
     glRotatef(transformation.m_Angle, transformation.m_Rotation.x , transformation.m_Rotation.y , transformation.m_Rotation.z);
-    //glTranslatef(transformation.m_Translation.x, transformation.m_Translation.y , transformation.m_Translation.z );
     glScalef(transformation.m_Scale.x,transformation.m_Scale.y,transformation.m_Scale.z);
 
     if(m_Color.x == -1){
@@ -117,14 +125,11 @@ void Entity::draw(Transformation transformation){
         glColor3f(m_Color.x,m_Color.y,m_Color.z);
         glutSolidCube(1);
     }
-   // glColor3f(1,0,0);
-   // glutSolidCube(1);
     glPopMatrix();
 
     for(auto& part : m_Parts){
         part->draw(transformation);
     }
-    //glPopMatrix();
 }
 
 void Entity::drawBody(){
@@ -247,6 +252,9 @@ Animation* Entity::getAnimation(string name){
     return m_Animations[name];
 }
 
+/*
+ * @param int : Amount. if -1 endless
+ */
 void Entity::playAnimation(string name, int loops){
     m_PlayingAnimations[name] = m_Animations[name];
     m_PlayingAnimations[name]->reload();
@@ -262,7 +270,9 @@ void Entity::setCollisionEnabled(bool b){
     m_CollisionEnabled = b;
 }
 
-//TODO: Vlt. löschen
+/*
+ * Deletes inactive children of an entity
+ */
 void Entity::deleteInactiveChildren(){
     for(int i = 0; i < m_Parts.size(); i++){
 

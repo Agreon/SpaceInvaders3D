@@ -20,6 +20,7 @@ void RenderScene() //Zeichenfunktion
 
 	glutSwapBuffers();
 
+	// Crappy counting, so that game not ends before sounds are played
 	if(game.getGameOverCounter() > 100 || game.getGameWonCounter() > 220){
 		exit(EXIT_SUCCESS);
 	}
@@ -49,6 +50,7 @@ void keyboard(unsigned char key, int x, int y)
 
 	switch (key)
 	{
+	// Escape
 	case '\x1B':
 		exit(EXIT_SUCCESS);
 		break;
@@ -68,7 +70,7 @@ int main(int argc, char **argv)
    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
    glutInitWindowSize( 800, 600 );
 	//1280x1024
-   glutCreateWindow( "Tim und Daniel" );
+   glutCreateWindow( "SpaceInvaders3D" );
    glutDisplayFunc( RenderScene );        
    glutReshapeFunc( Reshape );
 
@@ -83,7 +85,6 @@ int main(int argc, char **argv)
    
    Init();
    glutMainLoop();
-
 
    return 0;
 }

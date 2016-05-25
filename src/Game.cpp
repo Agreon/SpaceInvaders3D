@@ -128,7 +128,6 @@ bool Game::init(int sWidth, int sHeight){
 
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-	//glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseLight);
 
 	GLfloat spec[] = { 0, 0.8, 0, 1};
 	glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
@@ -154,7 +153,9 @@ void Game::keyUp(char key){
 void Game::event(){
 	m_Player->update(m_Keys);
 
+	// Shooting a Laser
 	if(m_Keys['e']){
+		// If player is allowed to shoot
 		if(m_Player->shoot()){
 			m_Lasers.push_back(new Laser(m_Player->getTransformation()->m_Translation.x,m_Player->getTransformation()->m_Translation.y + m_Player->getPart("gun")->getTransformation()->m_Translation.y,5));
 			m_Lasers.back()->setColor(Vec3D(0,1,0));
@@ -208,7 +209,7 @@ void Game::update(){
 		}
 	}
 
-	// Gegnerlaser
+	// Enemylaser
 	for(auto& laser : m_EnemyLasers){
 		laser->update();
 
@@ -340,14 +341,17 @@ void Game::update(){
 
 void Game::draw(){
 
-	glLoadIdentity();   // Aktuelle Model-/View-Transformations-Matrix zuruecksetzen
+	glLoadIdentity();
 
 	gluLookAt(0,0,m_ScreenWidth,0,0,0,0,1,0);
 
+	// Rotate screen if game is lost
 	glRotatef(m_GameOverCounter*3.6,0,0,1);
 
+	// Rotation of game
 	glRotatef(-45,1,0,0);
 
+	// Set the Position of the light source to the newest laser
 	if(m_Lasers.size() > 0){
 		glEnable(GL_LIGHT0);
 		GLfloat lightPos[] = {m_Lasers.back()->getTransformation()->m_Translation.x,
